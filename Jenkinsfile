@@ -1,13 +1,12 @@
 pipeline {
     agent {
-      label 'jenkins-agent-python38'
+      label 'docker'
     }
 
     stages {
         stage ('Run Test') {
             steps {
               sh """
-                  python -V
                   docker --version
               """
             }
