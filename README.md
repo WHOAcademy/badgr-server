@@ -1,6 +1,6 @@
-# Fork Chages
+# Fork Changes
 
-- Created a branch `master` for pipeline from `develop`
+- **Sep 22, 2020** - Created a branch `master` for pipeline from `develop`
 
 
 
