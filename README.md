@@ -1,11 +1,3 @@
-# Fork Changes
-
-- **Sep 22, 2020** - Created a branch `master` for pipeline from `develop`
-
-
-
-
-
 # Badgr Server
 *Digital badge management for issuers, earners, and consumers*
 
@@ -130,3 +122,22 @@ If your [badgr-ui](https://github.com/concentricsky/badgr-ui) is running on http
 Start in your `badgr` directory and clone badgr-ui source code: `git clone https://github.com/concentricsky/badgr-ui.git badgr-ui`
 
 For more details view the Readme for [Badgr UI](https://github.com/concentricsky/badgr-ui).
+
+
+# Fork Changes
+
+- **Sep 22, 2020** - Created a branch `master` for pipeline from `develop`
+
+## Deploy to ECS
+
+Build the docker image:
+
+```
+docker build -t badgr-server-ecs:1.0 -f .docker/ecs_deployment/Dockerfile.prod.ecs .
+```
+
+Run the docker image:
+
+```
+docker run -t -p 8080:8080 badgr-server-ecs:1.0"
+```
