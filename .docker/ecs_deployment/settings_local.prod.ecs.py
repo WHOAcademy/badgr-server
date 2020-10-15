@@ -19,7 +19,7 @@ LANGUAGE_CODE = 'en-us'
 # Database Configuration
 #
 ##
-BADGR_DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('BADGR_DB_NAME'),
