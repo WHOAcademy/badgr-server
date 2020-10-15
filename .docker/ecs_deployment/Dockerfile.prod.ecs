@@ -20,12 +20,6 @@ RUN apt-get install -y default-libmysqlclient-dev \
                        supervisor
 
 COPY requirements.txt                   /badgr_server
-COPY manage.py                          /badgr_server
-COPY .docker/ecs_deployment/uwsgi.ini              /badgr_server
-COPY .docker/ecs_deployment/wsgi.py                /badgr_server
-COPY apps                               /badgr_server/apps
-COPY .docker/ecs_deployment/settings_local.prod.ecs.py /badgr_server/apps/mainsite/settings_local.py
-COPY .docker/ecs_deployment/daemon.sh /badgr_server
 
 RUN pip install uwsgi
 RUN pip install -r requirements.txt
@@ -33,6 +27,14 @@ RUN pip install -r requirements.txt
 COPY .docker/ecs_deployment/nginx.conf /etc/nginx/nginx.conf
 COPY .docker/ecs_deployment/site.conf /etc/nginx/conf.d/
 COPY .docker/ecs_deployment/supervisord.conf /etc/supervisor/
+
+COPY manage.py                          /badgr_server
+COPY .docker/ecs_deployment/uwsgi.ini              /badgr_server
+COPY .docker/ecs_deployment/wsgi.py                /badgr_server
+COPY apps                               /badgr_server/apps
+COPY .docker/ecs_deployment/daemon.sh /badgr_server
+COPY .docker/ecs_deployment/settings_local.prod.ecs.py /badgr_server/apps/mainsite/settings_local.py
+
 
 # touch folders for nginx
 RUN mkdir /var/cache/nginx

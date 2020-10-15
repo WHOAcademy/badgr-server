@@ -10,7 +10,7 @@ DEBUG_ERRORS = DEBUG
 DEBUG_STATIC = DEBUG
 DEBUG_MEDIA = DEBUG
 
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en-us'
 
 
@@ -24,9 +24,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'badgr',
         'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': '',
+        'PASSWORD': 'root',
+        'HOST': '172.17.0.1',
+        'PORT': '3301',
         'OPTIONS': {
 #            "SET character_set_connection=utf8mb3, collation_connection=utf8_unicode_ci",  # Uncomment when using MySQL to ensure consistency across servers
         },
@@ -39,13 +39,13 @@ DATABASES = {
 # CACHE
 #
 ###
-CACHES = {
-     'default': {
-         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-         'LOCATION': 'memcached:11211',
-         'KEY_FUNCTION': 'mainsite.utils.filter_cache_key'
-     }
- }
+# CACHES = {
+#      'default': {
+#          'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#          'LOCATION': 'memcached:11211',
+#          'KEY_FUNCTION': 'mainsite.utils.filter_cache_key'
+#      }
+#  }
 
 
 
@@ -54,7 +54,7 @@ CACHES = {
 # Email Configuration
 #
 ###
-DEFAULT_FROM_EMAIL = ''  # e.g. "noreply@example.com"
+DEFAULT_FROM_EMAIL = 'noreply@academy.who.int'  # e.g. "noreply@example.com"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
@@ -73,12 +73,12 @@ CELERY_ALWAYS_EAGER = True
 # Application Options Configuration
 #
 ###
-HTTP_ORIGIN = 'http://localhost:8080'
+HTTP_ORIGIN = ''
 ALLOWED_HOSTS = ['*']
 STATIC_URL = HTTP_ORIGIN + '/static/'
 
 # Optionally restrict issuer creation to accounts that have the 'issuer.add_issuer' permission
-BADGR_APPROVED_ISSUERS_ONLY = False
+BADGR_APPROVED_ISSUERS_ONLY = True
 
 # Automatically send an email the first time that recipient identifier (email type) has been used on the system.
 GDPR_COMPLIANCE_NOTIFY_ON_FIRST_AWARD = True
@@ -142,3 +142,4 @@ LOGGING = {
     },
 }
 
+OPEN_FOR_SIGNUP = False

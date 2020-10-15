@@ -133,11 +133,11 @@ For more details view the Readme for [Badgr UI](https://github.com/concentricsky
 Build the docker image:
 
 ```
-docker build -t badgr-server-ecs:1.0 -f .docker/ecs_deployment/Dockerfile.prod.ecs .
+docker build -t badgr-server-ecs:2.0 -f .docker/ecs_deployment/Dockerfile.prod.ecs .
 ```
 
 Run the docker image:
 
 ```
-docker run -t -p 8080:8080 badgr-server-ecs:1.0"
+docker run -t -p 8000:8080 badgr-server-ecs:2.0
 ```
