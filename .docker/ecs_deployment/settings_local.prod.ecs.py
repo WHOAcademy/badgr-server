@@ -19,14 +19,14 @@ LANGUAGE_CODE = 'en-us'
 # Database Configuration
 #
 ##
-DATABASES = {
+BADGR_DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'badgr',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '172.17.0.1',
-        'PORT': '3301',
+        'NAME': os.getenv('BADGR_DB_NAME'),
+        'USER': os.getenv('BADGR_USERNAME'),
+        'PASSWORD': os.getenv('BADGR_PASSWORD'),
+        'HOST': os.getenv('BADGR_DB_HOST'),
+        'PORT': os.getenv('BADGR_DB_PORT'),
         'OPTIONS': {
 #            "SET character_set_connection=utf8mb3, collation_connection=utf8_unicode_ci",  # Uncomment when using MySQL to ensure consistency across servers
         },

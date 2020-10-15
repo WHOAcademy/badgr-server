@@ -128,15 +128,29 @@ For more details view the Readme for [Badgr UI](https://github.com/concentricsky
 
 - **Sep 22, 2020** - Created a branch `master` for pipeline from `develop`
 
-## Deploy to ECS
+## Deploy to ECS Prod
 
-Build the docker image:
+- Update the production config
+
+- Add Env for the following
+```
+BADGR_DB_NAME='dbname'
+BADGR_USERNAME='dbuser'
+BADGR_PASSWORD='dbpassword'
+BADGR_DB_HOST='dbhost'
+BADGR_DB_PORT=3306
+```
+
+- Update version tag and build the docker image:
 
 ```
 docker build -t badgr-server-ecs:2.0 -f .docker/ecs_deployment/Dockerfile.prod.ecs .
 ```
 
-Run the docker image:
+- Push the docker to production registry
+
+
+- Run the docker image:
 
 ```
 docker run -t -p 8000:8080 badgr-server-ecs:2.0
