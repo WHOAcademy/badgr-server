@@ -1,0 +1,23 @@
+# A dockerized badgr-server stack to emulate a production build
+version: '3.3'
+services:
+
+  # this container copies in the project code and runs the app with uwsgi
+  api_ecs:
+    build:
+      context: .
+      dockerfile: .docker/ecs_deployment/Dockerfile.prod.ecs
+    command: 'sh "/badgr_server/daemon.sh"'
+    ports:
+      - "8000:8080"
+    environment:
+      - BADGR_DB_NAME=
+      - BADGR_USERNAME=
+      - BADGR_PASSWORD=
+      - BADGR_DB_HOST=
+      - BADGR_DB_PORT=
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_STORAGE_BUCKET_NAME=
+      - AWS_REGION_NAME=
+      - AWS_CLOUDFRONT_URI=

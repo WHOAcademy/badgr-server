@@ -4,6 +4,7 @@ import random
 import string
 from .settings import *
 from mainsite import TOP_DIR
+from mainsite.aws.conf import *
 
 DEBUG = False
 DEBUG_ERRORS = DEBUG
@@ -73,9 +74,7 @@ CELERY_ALWAYS_EAGER = True
 # Application Options Configuration
 #
 ###
-HTTP_ORIGIN = ''
 ALLOWED_HOSTS = ['*']
-STATIC_URL = HTTP_ORIGIN + '/static/'
 
 # Optionally restrict issuer creation to accounts that have the 'issuer.add_issuer' permission
 BADGR_APPROVED_ISSUERS_ONLY = True

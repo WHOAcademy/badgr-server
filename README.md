@@ -126,7 +126,9 @@ For more details view the Readme for [Badgr UI](https://github.com/concentricsky
 
 # Fork Changes
 
-- **Sep 22, 2020** - Created a branch `master` for pipeline from `develop`
+## Changelog
+
+- Created a branch `master` from `develop` ( We shall make our changes to `master`)
 
 ## Deploy to ECS Prod
 
@@ -153,5 +155,5 @@ docker build -t badgr-server-ecs:2.0 -f .docker/ecs_deployment/Dockerfile.prod.e
 - Run the docker image:
 
 ```
-docker run -t -p 8000:8080 badgr-server-ecs:2.0
+docker-compose -f docker-compose.ecs.yml up --build
 ```
