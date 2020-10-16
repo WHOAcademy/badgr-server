@@ -129,6 +129,7 @@ For more details view the Readme for [Badgr UI](https://github.com/concentricsky
 ## Changelog
 
 - Created a branch `master` from `develop` ( We shall make our changes to `master`)
+- https://github.com/WHOAcademy/badgr-server/pull/1
 
 ## Deploy to ECS Prod
 
