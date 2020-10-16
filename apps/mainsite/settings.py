@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     'django_object_actions',
     'markdownify',
 
+    'storages',
+
     'badgeuser',
 
     'allauth',
