@@ -1,23 +1,29 @@
 kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
-  name: badgr-server
+  name: {{ .Values.serverName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.serverName }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
 spec:
   triggers:
     - type: ConfigChange
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    app: badgr-server
+    app: {{ .Values.serverName }}
   template:
     metadata:
       labels:
-        app: badgr-server
+        app: {{ .Values.serverName }}
     spec:
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
-          name: badgr-server
+          name: {{ .Values.serverName }}
           env:
             - name: MYSQL_DB_HOST
               value: $(BADGR_MYSQL_SERVICE_HOST)

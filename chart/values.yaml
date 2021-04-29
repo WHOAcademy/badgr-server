@@ -3,6 +3,7 @@
 ##
 
 fullnameOverrideDb: badgr-mysql
+serverName: badgr
 
 image: "mysql"
 imageTag: "5.7.30"
