@@ -133,6 +133,7 @@ STATICFILES_FINDERS = [
 STATIC_ROOT = os.path.join(TOP_DIR, 'staticfiles')
 STATIC_URL = HTTP_ORIGIN+'/static/'
 STATICFILES_DIRS = [
+    # STATIC_ROOT
     os.path.join(TOP_DIR, 'apps', 'mainsite', 'static'),
 ]
 
@@ -489,7 +490,7 @@ OPERATOR_URL = None
 
 # OVERRIDE THESE VALUES WITH YOUR OWN STABLE VALUES IN LOCAL SETTINGS
 from cryptography.fernet import Fernet
-AUTHCODE_SECRET_KEY = Fernet.generate_key()
+AUTHCODE_SECRET_KEY = b'vMv4wcGybyJ0Vk5gmDwXfikblAyrvkWE23J31IRosSI='
 
 AUTHCODE_EXPIRES_SECONDS = 600  # needs to be long enough to fetch information from socialauth providers
 
