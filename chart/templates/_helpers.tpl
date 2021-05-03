@@ -41,3 +41,48 @@ Create the name of the service account to use
 {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+  ********************************************************************************************************
+*/}}
+
+{{/*
+  Create a short orc name.
+  We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "badgr.name" -}}
+{{- printf "%s-%s" .Chart.Name .Values.orchestrator.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+  Create a default fully qualified orc name.
+  We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "badgr.fullname" -}}
+{{- printf "%s-%s" .Release.Name .Values.orchestrator.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Common labels
+*/}}
+{{- define "badgr.labels" -}}
+helm.sh/chart: {{ include "project.chart" . }}
+{{ include "badgr.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Selector labels orc
+*/}}
+{{- define "badgr.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "orc.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+deploymentconfig: {{ include "orc.fullname" . }}
+{{- end -}}
+
+{{/*
+  ********************************************************************************************************
+*/}}

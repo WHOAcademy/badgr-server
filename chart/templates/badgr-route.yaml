@@ -1,16 +1,13 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: {{ .Values.serverName }}-route
+  name: {{ include "badgr.name" . }}
   labels:
-    app: {{ .Values.serverName }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
+    {{- include "badgr.labels" . | nindent 4 }}
 spec:
   to:
     kind: Service
-    name: {{ .Values.serverName }}-service
+    name: "{{ include "badgr.fullname" . }}"
     weight: 100
   port:
     targetPort: 8080

@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.serverName }}-service
+  name: {{ include "badgr.fullname" . }}
   labels:
-    app: {{ .Values.serverName }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
+    {{- include "badgr.labels" . | nindent 4 }}
+  annotations:
+    description: Exposes and load balances the application pods got chitchat
 spec:
   selector:
-    app: {{ .Values.serverName }}
+     {{- include "badgr.selectorLabels" . | nindent 4 }}
   ports:
     - protocol: TCP
       port: 8080
