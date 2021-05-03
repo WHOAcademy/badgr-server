@@ -14,12 +14,12 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Values.serverName }}
+        {{- include "badgr.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
-          name: {{ .Values.serverName }}
+          name: {{ include "badgr.name" . }}
           env:
             - name: MYSQL_DB_HOST
               value: $(BADGR_MYSQL_SERVICE_HOST)
