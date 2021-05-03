@@ -51,7 +51,7 @@ Create the name of the service account to use
   We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "badgr.name" -}}
-{{- printf "%s-%s" .Chart.Name .Values.orchestrator.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Chart.Name .Values.serverName | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -59,7 +59,7 @@ Create the name of the service account to use
   We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "badgr.fullname" -}}
-{{- printf "%s-%s" .Release.Name .Values.orchestrator.name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name .Values.serverName | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -78,9 +78,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels orc
 */}}
 {{- define "badgr.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "orc.name" . }}
+app.kubernetes.io/name: {{ include "badgr.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-deploymentconfig: {{ include "orc.fullname" . }}
+deploymentconfig: {{ include "badgr.fullname" . }}
 {{- end -}}
 
 {{/*
