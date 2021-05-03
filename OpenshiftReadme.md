@@ -35,5 +35,5 @@ docker push quay.io/whoacademy/badgr-server
 
 ## To push to openshift 
 '''
-helm upgrade badgr-server ./chart
+helm upgrade --install badgr-server ./chart
 '''
