@@ -37,3 +37,7 @@ docker push quay.io/whoacademy/badgr-server
 '''
 helm upgrade --install badgr-server ./chart
 '''
+
+https://jenkins-labs-ci-cd.apps.dev.lxp.academy.who.int
+
+https://jenkins-labs-ci-cd.apps.who.lxp.academy.who.int
