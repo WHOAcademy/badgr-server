@@ -1,5 +1,5 @@
 include *.md
-include chart.*
+recursive-include chart
 include requirements.txt
 recursive-include apps/*/templates *
 recursive-include apps/*/static *

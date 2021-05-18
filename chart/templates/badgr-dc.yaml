@@ -30,7 +30,7 @@ spec:
             - name: MYSQL_DB_PASSWORD
               value: my-password
           securityContext:
-            runAsUser: 1000650001
+            runAsUser: 1000670001
           ports:
             - containerPort: 8080
               protocol: TCP
