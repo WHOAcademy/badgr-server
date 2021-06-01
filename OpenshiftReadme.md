@@ -41,3 +41,5 @@ helm upgrade --install badgr-server ./chart
 https://jenkins-labs-ci-cd.apps.dev.lxp.academy.who.int
 
 https://jenkins-labs-ci-cd.apps.who.lxp.academy.who.int
+
+YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
