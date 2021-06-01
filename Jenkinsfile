@@ -91,7 +91,7 @@ pipeline {
           stage("Build (Compile App)") {
             agent {
                 node {
-                    label "jenkins-agent-python38"
+                    label "jenkins-agent-helm"
                 }
             }
             steps {
