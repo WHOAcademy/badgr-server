@@ -175,7 +175,7 @@ pipeline {
                         }
                     }
                     when {
-                        expression { GIT_BRANCH.startsWith('main') || GIT_BRANCH.startsWith("main") }
+                        expression { GIT_BRANCH.startsWith('master') || GIT_BRANCH.startsWith("main") }
                     }
                     steps {
                         echo '### Commit new image tag to git ###'
