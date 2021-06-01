@@ -9,25 +9,24 @@ pipeline {
         PROJECT= "labs"
 
         // Config repo managed by ArgoCD details
-        ARGOCD_CONFIG_REPO = "github.com/WHOAcademy/lxp-config.git"
-        ARGOCD_CONFIG_REPO_PATH = "lxp-deployment/values-test.yaml"
-        ARGOCD_CONFIG_STAGING_REPO_PATH = "lxp-deployment/values-staging.yaml"
-        ARGOCD_CONFIG_REPO_BRANCH = "master"
-        SYSTEM_TEST_BRANCH = "master"
+        ARGOCD_CONFIG_REPO = 'github.com/WHOAcademy/lxp-config-dev.git'
+        ARGOCD_CONFIG_REPO_PATH = 'lxp-deployment/values-test.yaml'
+        ARGOCD_CONFIG_REPO_BRANCH = 'main'
+        SYSTEM_TEST_BRANCH = 'master'
 
         // Job name contains the branch eg ds-app-feature%2Fjenkins-123
-        JOB_NAME = "${JOB_NAME}".replace("%2F", "-").replace("/", "-")
+        JOB_NAME = "${JOB_NAME}".replace('%2F', '-').replace('/', '-')
 
         GIT_SSL_NO_VERIFY = true
 
         // Credentials bound in OpenShift
         GIT_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-git-auth")
         NEXUS_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-nexus-password")
-        QUAY_PUSH_SECRET = "who-lxp-imagepusher-secret"
+        QUAY_PUSH_SECRET = 'who-lxp-imagepusher-secret'
 
         // Nexus Artifact repo
-        NEXUS_REPO_NAME="labs-static"
-        NEXUS_REPO_HELM = "helm-charts"
+        NEXUS_REPO_NAME = 'labs-static'
+        NEXUS_REPO_HELM = 'helm-charts'
 
     }
 
@@ -98,7 +97,7 @@ pipeline {
             steps {
                 script {
                     // TODO FIX how version is pull
-                    env.VERSION = "1.0.0"
+                    env.VERSION = sh(returnStdout: true, script: 'yq e .pipelineVersion chart/Chart.yaml').trim()
                     env.VERSIONED_APP_NAME = "${NAME}-${VERSION}"
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
                     env.SECRET_KEY = 'gs7(p)fk=pf2(kbg*1wz$x+hnmw@y6%ij*x&pq4(^y8xjq$q#f' //TODO: get it from secret vault
@@ -167,71 +166,61 @@ pipeline {
                         '''
                     }
                 }
-                stage("test env - ArgoCD sync") {
+                stage('test env - ArgoCD sync') {
                     options {
                         skipDefaultCheckout(true)
                     }
                     agent {
                         node {
-                            label "jenkins-agent-argocd"
+                            label 'jenkins-agent-argocd'
                         }
                     }
                     when {
-                        expression { GIT_BRANCH.startsWith("master") }
+                        expression { GIT_BRANCH.startsWith('main') }
                     }
                     steps {
                         echo '### Commit new image tag to git ###'
                         sh  '''
-                            git clone https://${ARGOCD_CONFIG_REPO} config-repo
+                            git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@${ARGOCD_CONFIG_REPO} config-repo
                             cd config-repo
                             git checkout ${ARGOCD_CONFIG_REPO_BRANCH}
-                            yq w -i ${ARGOCD_CONFIG_REPO_PATH} "applications.name==test-${NAME}.source_ref" ${VERSION}
-                            git config --global user.email "edgarmonis@gmail.com"
-                            git config --global user.name "eddiebarry"
+                            # yq - Select and update matching values in map
+                            # https://mikefarah.gitbook.io/yq/v/v4.x/operators/select#select-and-update-matching-values-in-map
+                            yq e '(.applications.[] |= select(.name == ("test-" + env(NAME))) |= .source_ref = env(VERSION)' -i $ARGOCD_CONFIG_REPO_PATH
+                            git config --global user.email "jenkins@rht-labs.bot.com"
+                            git config --global user.name "Jenkins"
                             git config --global push.default simple
                             git add ${ARGOCD_CONFIG_REPO_PATH}
                             git commit -m "🚀 AUTOMATED COMMIT - Deployment of ${APP_NAME} at version ${VERSION} 🚀" || rc=$?
                             git remote set-url origin  https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@${ARGOCD_CONFIG_REPO}
                             git push -u origin ${ARGOCD_CONFIG_REPO_BRANCH}
                             # Give ArgoCD a moment to gather it's thoughts and roll out a deployment before Jenkins races on to test things
-                            # issue here is an asynchronous pipeline (argo) interacting with a synchronous job ie jenkins
-                            sleep 20
-                        '''
-                    }
-                }
-                stage("staging env - ArgoCD sync") {
-                    options {
-                        skipDefaultCheckout(true)
-                    }
-                    agent {
-                        node {
-                            label "jenkins-agent-argocd"
-                        }
-                    }
-                    when {
-                        expression { GIT_BRANCH.startsWith("master") }
-                    }
-                    steps {
-                        echo '### Commit new image tag to git ###'
-                        sh  '''
-                            git clone https://${ARGOCD_CONFIG_REPO} config-repo
-                            cd config-repo
-                            git checkout ${ARGOCD_CONFIG_REPO_BRANCH}
-                            yq w -i ${ARGOCD_CONFIG_STAGING_REPO_PATH} "applications.name==${NAME}.source_ref" ${VERSION}
-                            git config --global user.email "edgarmonis@gmail.com"
-                            git config --global user.name "eddiebarry"
-                            git config --global push.default simple
-                            git add ${ARGOCD_CONFIG_STAGING_REPO_PATH}
-                            git commit -m "🚀 AUTOMATED COMMIT - Deployment of ${APP_NAME} at version ${VERSION} 🚀" || rc=$?
-                            git remote set-url origin  https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@${ARGOCD_CONFIG_REPO}
-                            git push -u origin ${ARGOCD_CONFIG_REPO_BRANCH}
-                            # Give ArgoCD a moment to gather it's thoughts and roll out a deployment before Jenkins races on to test things
-                            # issue here is an asynchronous pipeline (argo) interacting with a synchronous job ie jenkins
+                            # issue here is an asynchronous pipline (argo) intreacting with a synchronous job ie jenkins
                             sleep 20
                         '''
                     }
                 }
 
+            }
+        }
+
+        stage('Trigger System Tests') {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label 'master'
+                }
+            }
+            when {
+                expression { GIT_BRANCH.startsWith('main') }
+            }
+            steps {
+                sh  '''
+                    echo "TODO - Run tests"
+                '''
+                build job: "system-tests/${SYSTEM_TEST_BRANCH}", parameters: [[$class: 'StringParameterValue', name: 'APP_NAME', value: "${APP_NAME}" ], [$class: 'StringParameterValue', name: 'VERSION', value: "${VERSION}"]], wait: false
             }
         }
     }
