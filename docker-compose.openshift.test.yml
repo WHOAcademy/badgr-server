@@ -16,6 +16,9 @@ services:
       - MYSQL_DB_USER=root
       - MYSQL_DB_PASSWORD=password
       - MYSQL_DB_HOST=db
+      - BADGR_USERNAME=whoa
+      - BADGR_EMAIL=whoa@who.int
+      - BADGR_PASSWORD=YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
     networks:
       - badgr
     ports:

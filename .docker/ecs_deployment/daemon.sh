@@ -6,4 +6,6 @@ python /badgr_server/manage.py migrate
 
 python /badgr_server/manage.py dist
 
+./manage.py shell < create_user.py 
+
 /usr/bin/supervisord

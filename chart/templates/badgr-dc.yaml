@@ -21,6 +21,16 @@ spec:
           terminationMessagePath: /dev/termination-log
           name: {{ include "badgr.name" . }}
           env:
+          {{- if .Values.managedDatabase.enabled }}
+            - name: MYSQL_DB_HOST
+              value: {{ .Values.managedDatabase.host }}
+            - name: MYSQL_DB_USER
+              value: {{ .Values.managedDatabase.user }}
+            - name: MYSQL_DB_NAME
+              value: {{ .Values.managedDatabase.name }}
+            - name: MYSQL_DB_PASSWORD
+              value: {{ .Values.managedDatabase.password }}
+          {{- else }}
             - name: MYSQL_DB_HOST
               value: $(BADGR_MYSQL_SERVICE_HOST)
             - name: MYSQL_DB_USER
@@ -29,6 +39,13 @@ spec:
               value: badgr
             - name: MYSQL_DB_PASSWORD
               value: my-password
+          {{- end }}
+            - name: BADGR_USERNAME
+              value: {{ .Values.env.badgrUserName }}
+            - name: BADGR_EMAIL
+              value: {{ .Values.env.badgrEmail }}
+            - name: BADGR_PASSWORD
+              value: {{ .Values.env.badgrPassword }}
           securityContext:
             runAsUser: 1000700001
           ports:

@@ -33,6 +33,7 @@ COPY .docker/ecs_deployment/uwsgi.ini              /badgr_server
 COPY .docker/ecs_deployment/wsgi.py                /badgr_server
 COPY apps                               /badgr_server/apps
 COPY .docker/ecs_deployment/daemon.sh /badgr_server
+COPY .docker/ecs_deployment/create_user.py /badgr_server
 
 # COPY .docker/ecs_deployment/aws /badgr_server/apps/mainsite/aws
 

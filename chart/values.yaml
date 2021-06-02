@@ -5,6 +5,19 @@
 fullnameOverrideDb: badgr-mysql
 serverName: badgr
 
+env:
+  badgrUserName: whoa
+  badgrEmail: whoa@who.int
+  badgrPassword: YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
+
+managedDatabase:
+  enabled: false
+  host: dummyval
+  user: dummyval
+  name: dummyval
+  password: dummyval
+  
+
 image: "mysql"
 imageTag: "5.7.30"
 
