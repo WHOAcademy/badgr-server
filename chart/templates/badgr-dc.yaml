@@ -46,8 +46,8 @@ spec:
               value: {{ .Values.env.badgrEmail }}
             - name: BADGR_PASSWORD
               value: {{ .Values.env.badgrPassword }}
-          securityContext:
-            runAsUser: 1000700001
+          # securityContext:
+          #   runAsUser: 1000700001
           ports:
             - containerPort: 8080
               protocol: TCP
