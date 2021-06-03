@@ -1,8 +1,8 @@
 FROM python:3.7-slim
 
 # Create a group and user to run our app
-# ARG APP_USER=1000700001
-# ARG APP_GROUP=1000700000
+ARG APP_USER=1000700001
+ARG APP_GROUP=1000700000
 # RUN groupadd -r ${APP_GROUP} && useradd --no-log-init -r -g ${APP_GROUP} ${APP_USER}
 
 RUN mkdir /badgr_server
@@ -44,29 +44,20 @@ COPY .docker/etc/settings_local.prod.py /badgr_server/apps/mainsite/settings_loc
 RUN mkdir /var/cache/nginx
 
 ## add permissions for nginx user
-# RUN chown -R ${APP_USER}:${APP_GROUP} /badgr_server && chmod -R 777 /badgr_server && \
-#         chown -R ${APP_USER}:${APP_GROUP} /var/cache/nginx && \
-#         chown -R ${APP_USER}:${APP_GROUP} /var/lib/nginx && \
-#         chown -R ${APP_USER}:${APP_GROUP} /var/log/nginx && \
-#         chown -R ${APP_USER}:${APP_GROUP} /etc/nginx/conf.d
-# RUN touch /var/run/nginx.pid && \
-#         chown -R ${APP_USER}:${APP_GROUP} /var/run/nginx.pid
-RUN mkdir /badgr_server/logs/
-RUN touch /badgr_server/logs/badgr_events.log
-RUN chmod -R 777 /badgr_server && \
-        chmod -R 777 /var/cache/nginx && \
-        chmod -R 777 /var/lib/nginx && \
-        chmod -R 777 /var/log/nginx && \
-        chmod -R 777 /etc/nginx/conf.d
-RUN touch /tmp/nginx.pid && \
-        chmod -R 777 /tmp/nginx.pid
+RUN chown -R ${APP_USER}:${APP_GROUP} /badgr_server && chmod -R 755 /badgr_server && \
+        chown -R ${APP_USER}:${APP_GROUP} /var/cache/nginx && \
+        chown -R ${APP_USER}:${APP_GROUP} /var/lib/nginx && \
+        chown -R ${APP_USER}:${APP_GROUP} /var/log/nginx && \
+        chown -R ${APP_USER}:${APP_GROUP} /etc/nginx/conf.d
+RUN touch /var/run/nginx.pid && \
+        chown -R ${APP_USER}:${APP_GROUP} /var/run/nginx.pid
 
 # forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Change to a non-root user
-# USER ${APP_USER}:${APP_GROUP}
+USER ${APP_USER}:${APP_GROUP}
 
 EXPOSE 8080
 
