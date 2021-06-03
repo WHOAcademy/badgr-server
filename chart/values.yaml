@@ -2,7 +2,7 @@
 ## ref: https://hub.docker.com/r/library/mysql/tags/
 ##
 
-fullnameOverrideDb: badgr-mysql
+# fullnameOverrideDb: badgr-mysql
 serverName: badgr
 
 env:
