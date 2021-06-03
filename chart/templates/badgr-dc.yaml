@@ -32,13 +32,13 @@ spec:
               value: {{ .Values.managedDatabase.password }}
           {{- else }}
             - name: MYSQL_DB_HOST
-              value: $(BADGR_MYSQL_SERVICE_HOST)
+              value: {{ include "mysql.fullname" . }}
             - name: MYSQL_DB_USER
-              value: my-user
+              value: {{ .Values.mysqlUser }}
             - name: MYSQL_DB_NAME
-              value: badgr
+              value: {{ .Values.mysqlDatabase }}
             - name: MYSQL_DB_PASSWORD
-              value: my-password
+              value: {{ .Values.mysqlPassword }}
           {{- end }}
             - name: BADGR_USERNAME
               value: {{ .Values.env.badgrUserName }}
