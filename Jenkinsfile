@@ -157,7 +157,7 @@ pipeline {
                         sh 'ls'
                         sh '''
                             # helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} --dry-run
-                            # helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} || rc=$?
+                            helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} || rc=$?
                             sleep 40
                             helm upgrade --install ${APP_NAME} \
                                 --namespace=${TARGET_NAMESPACE} \

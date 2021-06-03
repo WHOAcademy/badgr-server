@@ -2,7 +2,7 @@
 ## ref: https://hub.docker.com/r/library/mysql/tags/
 ##
 
-fullnameOverrideDb: badgr-mysql
+# fullnameOverrideDb: badgr-mysql
 serverName: badgr
 
 env:
@@ -261,3 +261,18 @@ initContainer:
     requests:
       memory: 10Mi
       cpu: 10m
+
+
+# OCP route
+route: 
+  # enable the OCP route
+  enabled: true
+  # enable https and auto redirect http to https
+  https_redirect: false
+  # configure the custom host name
+  # by default openshift will assign a host name
+  # if it is a private cluster it will assign the private route
+  # else the public route
+  custom_host:
+    enabled: false
+    name: badgr-badgr-labs-staging.apps.dev.lxp.academy.who.int

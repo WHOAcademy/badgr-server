@@ -1,3 +1,4 @@
+{{- if .Values.route.enabled }}
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
@@ -5,6 +6,15 @@ metadata:
   labels:
     {{- include "badgr.labels" . | nindent 4 }}
 spec:
+  {{- if .Values.route.custom_host.enabled }}
+  host: {{ .Values.route.custom_host.name }}
+  {{ end }}
   to:
     kind: Service
     name: "{{ include "badgr.fullname" . }}"
+  {{- if .Values.route.https_redirect }}
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  {{ end }}
+{{ end }}
