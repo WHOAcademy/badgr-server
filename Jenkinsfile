@@ -106,6 +106,24 @@ pipeline {
             }
         }
 
+        stage("Code Analysis") {
+            agent {
+                node {
+                    label "jenkins-agent-sonarqube"
+                }
+            }
+            steps {
+                sh 'printenv'
+                echo 'Running Code Analysis'
+
+                withSonarQubeEnv('Sonarqube') {
+                    sh  '''
+                    /sonarqube-scanner/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.language=py -Dsonar.sources=. -Dsonar.exclusions=*.xml -Dsonar.python.xunit.reportPath=xunittest.xml
+                    '''
+                }
+            }
+        }
+
   stage("Helm Package App (master)") {
             agent {
                 node {
