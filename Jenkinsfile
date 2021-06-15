@@ -100,7 +100,6 @@ pipeline {
                     env.VERSION = sh(returnStdout: true, script: 'yq e .pipelineVersion chart/Chart.yaml').trim()
                     env.VERSIONED_APP_NAME = "${NAME}-${VERSION}"
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
-                    env.SECRET_KEY = 'gs7(p)fk=pf2(kbg*1wz$x+hnmw@y6%ij*x&pq4(^y8xjq$q#f' //TODO: get it from secret vault
                 }
                 sh 'printenv'
             }
