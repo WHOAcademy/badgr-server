@@ -1,4 +1,4 @@
-sleep 100
+# sleep 100
 
 python /badgr_server/manage.py collectstatic --noinput
 

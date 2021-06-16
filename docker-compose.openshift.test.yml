@@ -19,6 +19,8 @@ services:
       - BADGR_USERNAME=whoa
       - BADGR_EMAIL=whoa@who.int
       - BADGR_PASSWORD=YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
+      - SECRET_KEY=test
+      - UNSUBSCRIBE_KEY=test
     networks:
       - badgr
     ports:

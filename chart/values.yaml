@@ -9,6 +9,8 @@ env:
   badgrUserName: whoa
   badgrEmail: whoa@who.int
   badgrPassword: YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
+  secretKey: JLmYqyW0aVLkY4eF6zp8rUYG0gr+QVvL7Wysa3PQ
+  unsubscribeKey: pDDijwH8aDiorMUxJ7nMM94gmBgfkHHIazj/HUaC
 
 managedDatabase:
   enabled: false
