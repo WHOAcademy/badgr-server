@@ -21,6 +21,7 @@ services:
       - BADGR_PASSWORD=YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
       - SECRET_KEY=test
       - UNSUBSCRIBE_KEY=test
+      - AUTHCODE_SECRET_KEY=vMv4wcGybyJ0Vk5gmDwXfikblAyrvkWE23J31IRosSI
     networks:
       - badgr
     ports:
