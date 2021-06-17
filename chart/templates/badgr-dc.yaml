@@ -50,6 +50,8 @@ spec:
               value: {{ .Values.env.secretKey }}
             - name: UNSUBSCRIBE_KEY
               value: {{ .Values.env.unsubscribeKey }}
+            - name: AUTHCODE_SECRET_KEY
+              value: {{ .Values.env.authcodeSecretKey }}
           ports:
             - containerPort: 8080
               protocol: TCP
