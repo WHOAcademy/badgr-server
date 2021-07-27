@@ -6,7 +6,7 @@ import os
 from .settings import *
 from mainsite import TOP_DIR
 
-DEBUG = False
+DEBUG = os.getenv("DEBUG") == 'true'
 DEBUG_ERRORS = DEBUG
 DEBUG_STATIC = DEBUG
 DEBUG_MEDIA = DEBUG

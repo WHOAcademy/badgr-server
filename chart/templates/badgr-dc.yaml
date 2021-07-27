@@ -51,7 +51,7 @@ spec:
               protocol: TCP
           imagePullPolicy: Always
           terminationMessagePolicy: File
-          image: 'quay.io/whoacademy/badgr-server:latest'
+          image: "{{ .Values.badgr_image_repository }}/{{ .Values.badgr_image_namespace }}/{{ .Values.badgr_image_name }}:{{ .Values.badgr_image_tag }}"
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
