@@ -1,0 +1,16 @@
+{{- if .Values.badgr_storage.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "badgr.fullname" . }}
+  labels:
+    {{- include "badgr.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.badgr_storage.volume_capacity }}
+  storageClassName: {{ .Values.badgr_storage.storageClassName }}
+  volumeMode: Filesystem
+{{- end }}
