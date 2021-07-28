@@ -13,11 +13,6 @@ badgr_image_tag: 0.1.0
 # fullnameOverrideDb: badgr-mysql
 serverName: badgr
 
-# badgr_server settings
-badgr_server:
-
-  media_path: 
-
 # File storage settings
 # https://github.com/WHOAcademy/lxp-docs/blob/master/docs/Creating_new_storageclass.adoc
 badgr_storage:
