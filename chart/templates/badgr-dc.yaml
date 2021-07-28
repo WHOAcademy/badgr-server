@@ -51,9 +51,21 @@ spec:
               protocol: TCP
           imagePullPolicy: Always
           terminationMessagePolicy: File
+          volumeMounts:
+          - name: "badgr-media"
+            mountPath: {{ .Values.badgr_storage.mountPath }}
           image: "{{ .Values.badgr_image_repository }}/{{ .Values.badgr_image_namespace }}/{{ .Values.badgr_image_name }}:{{ .Values.badgr_image_tag }}"
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
       schedulerName: default-scheduler
+      volumes:
+    {{- if .Values.badgr_storage.enabled }}
+      - name: badgr-media
+        persistentVolumeClaim:
+          claimName: {{ include "badgr.fullname" . }}
+    {{- else }}
+      - name: badgr-media
+        emptyDir: {}
+    {{- end }}

@@ -13,6 +13,16 @@ badgr_image_tag: 0.1.0
 # fullnameOverrideDb: badgr-mysql
 serverName: badgr
 
+# File storage settings
+# https://github.com/WHOAcademy/lxp-docs/blob/master/docs/Creating_new_storageclass.adoc
+badgr_storage:
+  enabled: true
+  # 595 photos can be stored in a 1Gi storage as an average, we can increase this based 
+  # on the requirement for other environments
+  volume_capacity: 2Gi
+  storageClassName: azure-file-storage
+  mountPath: /badgr_server/mediafiles
+
 env:
   badgrUserName: whoa
   badgrEmail: whoa@who.int
