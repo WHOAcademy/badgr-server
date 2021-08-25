@@ -189,7 +189,7 @@ RUN set -ex; \
 # END: Borrowed from: https://github.com/docker-library/python/blob/f154e5d1c8f5b582aa2fd782df880b9cc96bb431/3.7/bullseye/slim/Dockerfile
 # to install additional python dependencies
 #
-ENV A=A
+
 # Add missing packages
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y default-libmysqlclient-dev \
