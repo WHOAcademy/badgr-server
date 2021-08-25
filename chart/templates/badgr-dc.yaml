@@ -20,6 +20,18 @@ spec:
         - resources: {}
           terminationMessagePath: /dev/termination-log
           name: {{ include "badgr.name" . }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            timeoutSeconds: 3
           env:
           {{- if .Values.managedDatabase.enabled }}
             - name: MYSQL_DB_HOST
