@@ -1,0 +1,29 @@
+upstream uwsgi {
+    server unix:/badgr_server/app.sock;
+}
+
+server {
+    listen    8080;
+    server_name localhost;
+
+    # Enable ModSecurity on | off
+    modsecurity ${MOD_SECURITY};
+    # need an absolute folder
+    modsecurity_rules_file /usr/local/nginx/conf/modsecurity.conf;
+    charset   utf-8;
+
+    location /media  {
+         alias /badgr_server/mediafiles;
+    }
+
+    location /static {
+        alias /badgr_server/staticfiles;
+    }
+
+    location / {
+        uwsgi_pass  uwsgi;
+
+        include     /usr/local/nginx/conf/uwsgi_params;
+    }
+
+}

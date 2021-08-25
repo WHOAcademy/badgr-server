@@ -8,7 +8,7 @@ badgr_image_repository: quay.io
 badgr_image_name: badgr-server
 badgr_image_namespace: whoacademy
 # likely over written by the Argo definition
-badgr_image_tag: 0.1.0
+badgr_image_tag: 0.2.0
 
 # fullnameOverrideDb: badgr-mysql
 serverName: badgr
