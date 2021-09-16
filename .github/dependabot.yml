@@ -11,7 +11,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "08:00"
-      timezone: "Asia/Delhi"
+      
     open-pull-requests-limit: 5
     versioning-strategy: lockfile-only
     labels:
