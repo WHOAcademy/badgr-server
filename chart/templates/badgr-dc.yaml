@@ -17,7 +17,13 @@ spec:
         {{- include "badgr.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - resources: {}
+        - resources:
+            requests:
+              cpu: {{ .Values.hpa.cpuTarget }}
+              memory: {{ .Values.hpa.memTarget }}
+            limits:
+              cpu: {{ .Values.hpa.cpuLimit }}
+              memory: {{ .Values.hpa.memLimit }}
           terminationMessagePath: /dev/termination-log
           name: {{ include "badgr.name" . }}
           livenessProbe:
