@@ -490,7 +490,7 @@ OPERATOR_URL = None
 
 # OVERRIDE THESE VALUES WITH YOUR OWN STABLE VALUES IN LOCAL SETTINGS
 from cryptography.fernet import Fernet
-AUTHCODE_SECRET_KEY = b'vMv4wcGybyJ0Vk5gmDwXfikblAyrvkWE23J31IRosSI='
+AUTHCODE_SECRET_KEY = os.getenv('AUTHCODE_SECRET_KEY')
 
 AUTHCODE_EXPIRES_SECONDS = 600  # needs to be long enough to fetch information from socialauth providers
 

@@ -84,8 +84,8 @@ BADGR_APPROVED_ISSUERS_ONLY = False
 # Automatically send an email the first time that recipient identifier (email type) has been used on the system.
 GDPR_COMPLIANCE_NOTIFY_ON_FIRST_AWARD = True
 
-SECRET_KEY = 'JLmYqyW0aVLkY4eF6zp8rUYG0gr+QVvL7Wysa3PQ'
-UNSUBSCRIBE_KEY = 'pDDijwH8aDiorMUxJ7nMM94gmBgfkHHIazj/HUaC'
+SECRET_KEY = os.getenv('SECRET_KEY')
+UNSUBSCRIBE_KEY = os.getenv('UNSUBSCRIBE_KEY')
 UNSUBSCRIBE_SECRET_KEY = str(SECRET_KEY)
 
 

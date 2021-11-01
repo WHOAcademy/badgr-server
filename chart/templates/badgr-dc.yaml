@@ -64,6 +64,12 @@ spec:
               value: {{ .Values.env.badgrEmail }}
             - name: BADGR_PASSWORD
               value: {{ .Values.env.badgrPassword }}
+            - name: SECRET_KEY
+              value: {{ .Values.env.secretKey }}
+            - name: UNSUBSCRIBE_KEY
+              value: {{ .Values.env.unsubscribeKey }}
+            - name: AUTHCODE_SECRET_KEY
+              value: {{ .Values.env.authcodeSecretKey }}
           ports:
             - containerPort: 8080
               protocol: TCP
