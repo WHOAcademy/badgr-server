@@ -153,7 +153,7 @@ AWS_CLOUDFRONT_URI=
 - Update version tag and build the docker image:
 
 ```
-docker build -t badgr-server-ecs:2.0 -f .docker/ecs_deployment/Dockerfile.prod.ecs .
+docker build -t badgr-server-ecs:2.0 -f .docker/azure_deployment/Dockerfile.prod.azure .
 ```
 
 - Push the docker to production registry
@@ -162,5 +162,5 @@ docker build -t badgr-server-ecs:2.0 -f .docker/ecs_deployment/Dockerfile.prod.e
 - Run the docker image:
 
 ```
-docker-compose -f docker-compose.ecs.yml up --build
+docker-compose -f docker-compose.azure.yml up --build
 ```

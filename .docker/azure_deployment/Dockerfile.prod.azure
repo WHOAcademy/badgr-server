@@ -24,19 +24,19 @@ COPY requirements.txt                   /badgr_server
 RUN pip install uwsgi
 RUN pip install -r requirements.txt
 
-COPY .docker/ecs_deployment/nginx.conf /etc/nginx/nginx.conf
-COPY .docker/ecs_deployment/site.conf /etc/nginx/conf.d/
-COPY .docker/ecs_deployment/supervisord.conf /etc/supervisor/
+COPY .docker/azure_deployment/nginx.conf /etc/nginx/nginx.conf
+COPY .docker/azure_deployment/site.conf /etc/nginx/conf.d/
+COPY .docker/azure_deployment/supervisord.conf /etc/supervisor/
 
 COPY manage.py                          /badgr_server
-COPY .docker/ecs_deployment/uwsgi.ini              /badgr_server
-COPY .docker/ecs_deployment/wsgi.py                /badgr_server
+COPY .docker/azure_deployment/uwsgi.ini              /badgr_server
+COPY .docker/azure_deployment/wsgi.py                /badgr_server
 COPY apps                               /badgr_server/apps
-COPY .docker/ecs_deployment/daemon.sh /badgr_server
+COPY .docker/azure_deployment/daemon.sh /badgr_server
 
-COPY .docker/ecs_deployment/aws /badgr_server/apps/mainsite/aws
+COPY .docker/azure_deployment/aws /badgr_server/apps/mainsite/aws
 
-COPY .docker/ecs_deployment/settings_local.prod.ecs.py /badgr_server/apps/mainsite/settings_local.py
+COPY .docker/azure_deployment/settings_local.prod.ecs.py /badgr_server/apps/mainsite/settings_local.py
 
 
 # touch folders for nginx

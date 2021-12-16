@@ -6,7 +6,7 @@ services:
   api_ecs:
     build:
       context: .
-      dockerfile: .docker/ecs_deployment/Dockerfile.prod.ecs
+      dockerfile: .docker/azure_deployment/Dockerfile.prod.azure
     command: 'sh "/badgr_server/daemon.sh"'
     ports:
       - "8000:8080"
