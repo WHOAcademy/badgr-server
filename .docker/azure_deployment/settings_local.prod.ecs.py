@@ -4,7 +4,6 @@ import random
 import string
 from .settings import *
 from mainsite import TOP_DIR
-from mainsite.aws.conf import *
 
 DEBUG = False
 DEBUG_ERRORS = DEBUG
@@ -142,3 +141,10 @@ LOGGING = {
 }
 
 OPEN_FOR_SIGNUP = False
+
+# Azure storage settings
+
+AZURE_ACCOUNT_NAME = os.getenv('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = os.getenv('AZURE_ACCOUNT_KEY')
+AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
+AZURE_CONTAINER = os.getenv('AZURE_CONTAINER')

@@ -497,3 +497,10 @@ AUTHCODE_EXPIRES_SECONDS = 600  # needs to be long enough to fetch information f
 SAML_EMAIL_KEYS = ['Email', 'email', 'mail', 'emailaddress', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
 SAML_FIRST_NAME_KEYS = ['FirstName', 'givenName', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname']
 SAML_LAST_NAME_KEYS = ['LastName', 'sn', 'surname', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
+
+# AZURE SETTINGS
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_ACCOUNT_NAME = 'YOUR_ACCOUNT_NAME_HERE'
+AZURE_ACCOUNT_KEY = 'YOUR_ACCOUNT_KEY_HERE'
+AZURE_CONNECTION_STRING = 'YOUR_CONNECTION_STRING_HERE'
+AZURE_CONTAINER = 'CONTAINER_NAME_HERE'

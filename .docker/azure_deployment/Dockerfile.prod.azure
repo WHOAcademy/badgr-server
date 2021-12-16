@@ -34,8 +34,6 @@ COPY .docker/azure_deployment/wsgi.py                /badgr_server
 COPY apps                               /badgr_server/apps
 COPY .docker/azure_deployment/daemon.sh /badgr_server
 
-COPY .docker/azure_deployment/aws /badgr_server/apps/mainsite/aws
-
 COPY .docker/azure_deployment/settings_local.prod.ecs.py /badgr_server/apps/mainsite/settings_local.py
 
 
