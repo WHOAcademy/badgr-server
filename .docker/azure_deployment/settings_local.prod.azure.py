@@ -2,7 +2,7 @@
 
 import random
 import string
-from .settings import 
+from .settings import *
 from mainsite import TOP_DIR
 
 DEBUG = False
