@@ -498,7 +498,8 @@ SAML_EMAIL_KEYS = ['Email', 'email', 'mail', 'emailaddress', 'http://schemas.xml
 SAML_FIRST_NAME_KEYS = ['FirstName', 'givenName', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname']
 SAML_LAST_NAME_KEYS = ['LastName', 'sn', 'surname', 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname']
 
-# AZURE SETTINGS
+# AZURE STORAGE SETTINGS
+# NOTE: These settings will be overriden by settings_local.prod.py file
 DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 AZURE_ACCOUNT_NAME = 'YOUR_ACCOUNT_NAME_HERE'
 AZURE_ACCOUNT_KEY = 'YOUR_ACCOUNT_KEY_HERE'
