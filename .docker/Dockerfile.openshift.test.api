@@ -1,5 +1,5 @@
 # https://github.com/WHOAcademy/nginx-mod-security-3
-FROM quay.io/whoacademy/nginx-mod-security-3:0.2
+FROM whoalxp.azurecr.io/nginx-mod-security-3:0.2
 
 # Change to root user to install additional dependencies
 USER root

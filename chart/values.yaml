@@ -4,9 +4,9 @@
 
 ##
 # Docker deets
-badgr_image_repository: quay.io
+badgr_image_repository: azurecr.io
 badgr_image_name: badgr-server
-badgr_image_namespace: whoacademy
+badgr_image_namespace: whoalxp
 # likely over written by the Argo definition
 badgr_image_tag: 0.2.0
 

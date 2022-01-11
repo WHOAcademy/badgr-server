@@ -22,7 +22,7 @@ pipeline {
         // Credentials bound in OpenShift
         GIT_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-git-auth")
         NEXUS_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-nexus-password")
-        QUAY_PUSH_SECRET = 'who-lxp-imagepusher-secret'
+        REGISTRY_PUSH_SECRET = 'who-lxp-imagepusher-secret'
 
         // Nexus Artifact repo
         NEXUS_REPO_NAME = 'labs-static'
@@ -57,10 +57,10 @@ pipeline {
                         script {
                             env.APP_ENV = "prod"
                             // External image push registry info
-                            env.IMAGE_REPOSITORY = "quay.io"
+                            env.IMAGE_REPOSITORY = "azurecr.io"
                             // app name for master is just learning-experience-platform or something
                             env.APP_NAME = "${NAME}".replace("/", "-").toLowerCase()
-                            env.TARGET_NAMESPACE = "whoacademy"
+                            env.TARGET_NAMESPACE = "whoalxp"
                         }
                     }
                 }
