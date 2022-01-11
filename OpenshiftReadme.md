@@ -25,12 +25,12 @@ docker-compose -f docker-compose.openshift.test.yml up --build
 
 ## Commit to quay
 '''
-docker commit badgr-server_api_1 quay.io/whoacademy/badgr-server
+docker commit badgr-server_api_1 whoalxp.azurecr.io/badgr-server
 '''
 
 ## Push to quay
 '''
-docker push quay.io/whoacademy/badgr-server
+docker push whoalxp.azurecr.io/badgr-server
 '''
 
 ## To push to openshift 
