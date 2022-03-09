@@ -299,7 +299,7 @@ hpa:
   enabled: false
   minReplicas: 1
   maxReplicas: 5
-  cpuTarget: 200m
-  memTarget: 750Mi
-  cpuLimit: 400m
-  memLimit: 1.5Gi
+  cpuRequest: 20m
+  memRequest: 700Mi
+  cpuLimit: 40m
+  memLimit: 1.4Gi
