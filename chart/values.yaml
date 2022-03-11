@@ -296,10 +296,10 @@ route:
     name: badgr-badgr-labs-staging.apps.dev.lxp.academy.who.int
 
 hpa:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 5
-  cpuRequest: 30m
-  memRequest: 700Mi
-  cpuLimit: 60m
-  memLimit: 1.4Gi
+  cpuRequest: 50m
+  memRequest: 1.5Gi
+  cpuLimit: 80m
+  memLimit: 2Gi
