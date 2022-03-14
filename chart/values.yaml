@@ -296,7 +296,7 @@ route:
     name: badgr-badgr-labs-staging.apps.dev.lxp.academy.who.int
 
 hpa:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 5
   cpuRequest: 200m
