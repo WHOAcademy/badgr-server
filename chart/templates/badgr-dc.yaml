@@ -19,8 +19,8 @@ spec:
       containers:
         - resources:
             requests:
-              cpu: {{ .Values.hpa.cpuTarget }}
-              memory: {{ .Values.hpa.memTarget }}
+              cpu: {{ .Values.hpa.cpuRequest }}
+              memory: {{ .Values.hpa.memRequest }}
             limits:
               cpu: {{ .Values.hpa.cpuLimit }}
               memory: {{ .Values.hpa.memLimit }}
