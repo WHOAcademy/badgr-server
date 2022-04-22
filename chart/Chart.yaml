@@ -2,7 +2,7 @@ apiVersion: v2
 name: badgr
 description: A Helm chart to deploy the badgr-server
 version: 1.0.1
-appVersion: 5.7.31
+appVersion: 5.7.30
 home: https://github.com/WHOAcademy/badgr-server
 dependencies:
 - name: mysql
