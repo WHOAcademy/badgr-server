@@ -28,12 +28,44 @@ env:
   badgrEmail: whoa@who.int
   badgrPassword: YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
 
+# https://artifacthub.io/packages/helm/bitnami/mysql#parameters
+mysql:
+  primary:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    persistence:
+      enabled: false
+    service:
+      port: 3306
+  secondary:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+    persistence:
+      enabled: false
+    service:
+      port: 3306
+  auth:
+    rootPassword: password
+    database: badgr
+    username: my-user
+    password: my-password  # TODO: encrypt data 
+
 managedDatabase:
+  #enabled: false to use in-cluster database
+  #enabled: true to use managed RDBMS database
   enabled: false
-  host: dummyval
-  user: dummyval
-  name: dummyval
-  password: dummyval
+  # values will be overridden by the config repo based on the namespace
+  # different values for database will be available in values-*.yaml file from the config repo
+  auth:
+    host: dummyval
+    username: dummyval
+    database: dummyval
+    password: dummyval
+    port: 3306
   
 
 image: "mysql"
@@ -56,13 +88,13 @@ testFramework:
 # Specify password for root user
 #
 # Default: random 10 character string
-mysqlRootPassword: password
+#mysqlRootPassword: password
 
 # Create a database user
 #
-mysqlUser: my-user
+#mysqlUser: my-user
 # Default: random 10 character string
-mysqlPassword: my-password
+#mysqlPassword: my-password
 
 # Allow unauthenticated access, uncomment to enable
 #
@@ -70,7 +102,7 @@ mysqlPassword: my-password
 
 # Create a database
 #
-mysqlDatabase: badgr
+#mysqlDatabase: badgr
 
 ## Specify an imagePullPolicy (Required)
 ## It's recommended to change this to 'Always' if the image tag is 'latest'

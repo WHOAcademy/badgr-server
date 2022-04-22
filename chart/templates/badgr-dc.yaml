@@ -41,22 +41,24 @@ spec:
           env:
           {{- if .Values.managedDatabase.enabled }}
             - name: MYSQL_DB_HOST
-              value: {{ .Values.managedDatabase.host }}
+              value: "{{ .Values.managedDatabase.auth.host }}"
             - name: MYSQL_DB_USER
-              value: {{ .Values.managedDatabase.user }}
+              value: "{{ .Values.managedDatabase.auth.username }}"
             - name: MYSQL_DB_NAME
-              value: {{ .Values.managedDatabase.name }}
+              value: "{{ .Values.managedDatabase.auth.database }}"
             - name: MYSQL_DB_PASSWORD
-              value: {{ .Values.managedDatabase.password }}
+              value: "{{ .Values.managedDatabase.auth.password }}"
           {{- else }}
             - name: MYSQL_DB_HOST
-              value: {{ include "mysql.fullname" . }}
+              value: "{{ .Release.Name }}-mysql"
             - name: MYSQL_DB_USER
-              value: {{ .Values.mysqlUser }}
+              value: "{{ .Values.mysql.auth.username }}"
             - name: MYSQL_DB_NAME
-              value: {{ .Values.mysqlDatabase }}
+              value: "{{ .Values.mysql.auth.database }}"
             - name: MYSQL_DB_PASSWORD
-              value: {{ .Values.mysqlPassword }}
+              value: "{{ .Values.mysql.auth.password }}"
+            - name: DATABASE_SERVICE_PORT
+              value: "{{ .Values.mysql.primary.service.port }}"
           {{- end }}
             - name: BADGR_USERNAME
               value: {{ .Values.env.badgrUserName }}
