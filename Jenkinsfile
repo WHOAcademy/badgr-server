@@ -132,6 +132,9 @@ pipeline {
             steps {
                 sh 'printenv'
                 sh '''
+                    helm lint chart
+                '''
+                sh '''
                     # might be overkill...
                     yq e ".appVersion = env(VERSION)" -i chart/Chart.yaml
                     yq e ".version = env(VERSION)" -i chart/Chart.yaml
