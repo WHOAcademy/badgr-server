@@ -83,7 +83,7 @@ spec:
           terminationMessagePolicy: File
           volumeMounts:
           - name: "badgr-media"
-            mountPath: {{ .Values.badgr_storage.mountPath }}
+            mountPath: {{ .Values.storage.mountPath }}
           image: "{{ .Values.badgr_image_namespace }}.{{ .Values.badgr_image_repository }}/{{ .Values.badgr_image_name }}:{{ .Values.badgr_image_tag }}"
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
@@ -91,7 +91,7 @@ spec:
       securityContext: {}
       schedulerName: default-scheduler
       volumes:
-    {{- if .Values.badgr_storage.enabled }}
+    {{- if .Values.storage.enabled }}
       - name: badgr-media
         persistentVolumeClaim:
           claimName: {{ include "badgr.fullname" . }}
