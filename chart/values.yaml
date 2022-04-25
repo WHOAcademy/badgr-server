@@ -173,8 +173,8 @@ readinessProbe:
   failureThreshold: 3
 
 ## Persist data to a persistent volume
-persistence:
-  enabled: true
+#persistence:
+  #enabled: true
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -183,9 +183,9 @@ persistence:
   ##   GKE, AWS & OpenStack)
   ##
   # storageClass: "-"
-  accessMode: ReadWriteOnce
-  size: 8Gi
-  annotations: {}
+  #accessMode: ReadWriteOnce
+  #size: 8Gi
+  #annotations: {}
 
 ## Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
@@ -255,12 +255,12 @@ metrics:
 
 ## Configure the service
 ## ref: http://kubernetes.io/docs/user-guide/services/
-service:
-  annotations: {}
+#service:
+  #annotations: {}
   ## Specify a service type
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services---service-types
-  type: ClusterIP
-  port: 3306
+  #type: ClusterIP
+  #port: 3306
   # nodePort: 32000
   # loadBalancerIP:
 
