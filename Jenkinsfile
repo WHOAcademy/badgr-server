@@ -79,6 +79,7 @@ pipeline {
                     steps {
                         script {
                             env.APP_ENV = "dev"
+                            env.IMAGE_REPOSITORY = 'image-registry.openshift-image-registry.svc:5000'
                             // Sandbox registry deets
                             env.APP_NAME = "${GIT_BRANCH}-${NAME}".replace("/", "-").toLowerCase()
                             env.TARGET_NAMESPACE = "labs-dev"
