@@ -1,4 +1,4 @@
-{{- if .Values.badgr_storage.enabled -}}
+{{- if .Values.storage.enabled -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,7 +10,7 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.badgr_storage.volume_capacity }}
-  storageClassName: {{ .Values.badgr_storage.storageClassName }}
+      storage: {{ .Values.storage.volume_capacity }}
+  storageClassName: {{ .Values.storage.storageClassName }}
   volumeMode: Filesystem
 {{- end }}

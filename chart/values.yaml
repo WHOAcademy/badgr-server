@@ -11,12 +11,9 @@ badgr_image_namespace: whoalxp
 # likely over written by the Argo definition
 badgr_image_tag: 0.2.0
 
-# fullnameOverrideDb: badgr-mysql
-serverName: badgr
-
 # File storage settings
 # https://github.com/WHOAcademy/lxp-docs/blob/master/docs/Creating_new_storageclass.adoc
-badgr_storage:
+storage:
   enabled: true
   # 595 photos can be stored in a 1Gi storage as an average, we can increase this based 
   # on the requirement for other environments
@@ -73,13 +70,6 @@ managedDatabase:
     password: dummyval
     port: 3306
 
-strategy:
-  type: Recreate
-
-busybox:
-  image: "busybox"
-  tag: "1.32"
-
 testFramework:
   enabled: false
   image: "bats/bats"
@@ -87,95 +77,8 @@ testFramework:
   imagePullPolicy: IfNotPresent
   securityContext: {}
 
-# Specify password for root user
-#
-# Default: random 10 character string
-#mysqlRootPassword: password
-
-# Create a database user
-#
-#mysqlUser: my-user
-# Default: random 10 character string
-#mysqlPassword: my-password
-
-# Allow unauthenticated access, uncomment to enable
-#
-# mysqlAllowEmptyPassword: true
-
-# Create a database
-#
-#mysqlDatabase: badgr
-
-## Specify an imagePullPolicy (Required)
-## It's recommended to change this to 'Always' if the image tag is 'latest'
-## ref: http://kubernetes.io/docs/user-guide/images/#updating-images
-##
-imagePullPolicy: IfNotPresent
-
-## Additionnal arguments that are passed to the MySQL container.
-## For example use --default-authentication-plugin=mysql_native_password if older clients need to
-## connect to a MySQL 8 instance.
-args: []
-
-livenessProbe:
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  successThreshold: 1
-  failureThreshold: 3
-
-readinessProbe:
-  initialDelaySeconds: 5
-  periodSeconds: 10
-  timeoutSeconds: 1
-  successThreshold: 1
-  failureThreshold: 3
-
-## Persist data to a persistent volume
-#persistence:
-  #enabled: true
-  ## database data Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  #accessMode: ReadWriteOnce
-  #size: 8Gi
-  #annotations: {}
-
-## Configure resource requests and limits
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-##
-resources:
-  requests:
-    memory: 256Mi
-    cpu: 100m
-
 # Custom mysql configuration files path
 configurationFilesPath: /etc/mysql/conf.d/
-
-metrics:
-  enabled: false
-  image: prom/mysqld-exporter
-  imageTag: v0.10.0
-  imagePullPolicy: IfNotPresent
-  resources: {}
-  annotations: {}
-    # prometheus.io/scrape: "true"
-    # prometheus.io/port: "9104"
-  livenessProbe:
-    initialDelaySeconds: 15
-    timeoutSeconds: 5
-  readinessProbe:
-    initialDelaySeconds: 5
-    timeoutSeconds: 1
-  flags: []
-  serviceMonitor:
-    enabled: false
-    additionalLabels: {}
 # OCP route
 route: 
   # enable the OCP route
