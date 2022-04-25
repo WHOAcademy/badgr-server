@@ -77,8 +77,6 @@ testFramework:
   imagePullPolicy: IfNotPresent
   securityContext: {}
 
-# Custom mysql configuration files path
-configurationFilesPath: /etc/mysql/conf.d/
 # OCP route
 route: 
   # enable the OCP route
