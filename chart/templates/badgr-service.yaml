@@ -13,3 +13,8 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      name: 8080-tcp
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

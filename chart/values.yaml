@@ -48,6 +48,11 @@ mysql:
       enabled: false
     service:
       port: 3306
+  image:
+    registry: whoalxp.azurecr.io
+    repository: whoa-mysql
+    tag: "1.1"
+    pullSecrets: ["who-lxp-imagepusher-secret"]
   auth:
     rootPassword: password
     database: badgr
@@ -68,8 +73,8 @@ managedDatabase:
     port: 3306
   
 
-image: "mysql"
-imageTag: "5.7.30"
+#image: "mysql"
+#imageTag: "5.7.30"
 
 strategy:
   type: Recreate
@@ -79,7 +84,7 @@ busybox:
   tag: "1.32"
 
 testFramework:
-  enabled: true
+  enabled: false
   image: "bats/bats"
   tag: "1.2.1"
   imagePullPolicy: IfNotPresent
