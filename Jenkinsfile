@@ -122,21 +122,21 @@ pipeline {
                 '''
             }
             // Post can be used both on individual stages and for the entire build.
-            post {
-                always {
+            //post {
+                //always {
                     // archiveArtifacts "**"
-                    junit 'xunittest.xml'
+                    //junit 'xunittest.xml'
                     // publish html
-                    publishHTML target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'cover',
-                        reportFiles: 'index.html',
-                        reportName: 'Django Code Coverage'
-                    ]
-                }
-            }
+                    //publishHTML target: [
+                        //allowMissing: false,
+                        //alwaysLinkToLastBuild: false,
+                        //keepAll: true,
+                        //reportDir: 'cover',
+                       // reportFiles: 'index.html',
+                        //reportName: 'Django Code Coverage'
+                   // ]
+                //}
+           // }
         }
         
         stage("Code Analysis") {
