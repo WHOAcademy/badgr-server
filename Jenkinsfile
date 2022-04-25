@@ -82,30 +82,63 @@ pipeline {
                             env.IMAGE_REPOSITORY = 'image-registry.openshift-image-registry.svc:5000'
                             // Sandbox registry deets
                             env.APP_NAME = "${GIT_BRANCH}-${NAME}".replace("/", "-").toLowerCase()
-                            env.TARGET_NAMESPACE = "labs-dev"
+                            env.TARGET_NAMESPACE = "${PROJECT}-" + env.APP_ENV
                         }
                     }
                 }
             }
         }
-
-          stage("Build (Compile App)") {
+        stage("Build (Compile App)") {
             agent {
                 node {
-                    label "jenkins-agent-helm"
+                    label "jenkins-agent-python38"
                 }
             }
             steps {
                 script {
-                    // TODO FIX how version is pull
                     env.VERSION = sh(returnStdout: true, script: "grep -oP \"(?<=version=')[^']*\" setup.py").trim()
                     env.VERSIONED_APP_NAME = "${NAME}-${VERSION}"
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
+                    env.SECRET_KEY = 'gs7(p)fk=pf2(kbg*1wz$x+hnmw@y6%ij*x&pq4(^y8xjq$q#f' //TODO: get it from secret vault
+                    env.TEST_DATABASE_SERVICE_HOST = "mysql.labs-ci-cd"
+                    env.TEST_DATABASE_SERVICE_PORT = "3306"
                 }
                 sh 'printenv'
+
+                echo '### Install deps ###'
+                sh 'pip install -r requirements.txt'
+
+                echo '### Running tests ###'
+                sh 'python manage.py migrate --settings=openedx_extension.settings.test'
+                // sh 'python manage.py test --settings=openedx_extension.settings.test --with-coverage --cover-erase --cover-package=credentials --with-xunit --xunit-file=xunittest.xml --cover-branches --cover-html'
+                sh 'python manage.py test --keepdb -v 3 --settings=openedx_extension.settings.test'
+
+                echo '### Packaging App for Nexus ###'
+                sh '''
+                    python -m pip install --upgrade pip
+                    pip install setuptools wheel
+                    python setup.py sdist
+                    curl -v -f -u ${NEXUS_CREDS} --upload-file dist/${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                '''
+            }
+            // Post can be used both on individual stages and for the entire build.
+            post {
+                always {
+                    // archiveArtifacts "**"
+                    junit 'xunittest.xml'
+                    // publish html
+                    publishHTML target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: 'cover',
+                        reportFiles: 'index.html',
+                        reportName: 'Django Code Coverage'
+                    ]
+                }
             }
         }
-
+        
         stage("Code Analysis") {
             agent {
                 node {
@@ -123,8 +156,46 @@ pipeline {
                 }
             }
         }
+        stage("Bake (OpenShift Build)") {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label "master"
+                }
+            }
+            steps {
+                sh 'printenv'
 
-  stage("Helm Package App (master)") {
+                echo '### Get Binary from Nexus and shove it in a box ###'
+                sh  '''
+                    rm -rf package-contents*
+                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
+                    tar -xvf ${PACKAGE}
+                    BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG}"
+                    echo ${BUILD_ARGS}
+                    # oc get bc ${APP_NAME} || rc=$?
+                    # dirty hack so i don't have to oc patch the bc for the new version when pushing to quay ...
+                    oc delete bc ${APP_NAME} || rc=$?
+                    if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
+                        echo "🏗 Creating a sandbox build for inside the cluster 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
+                        # used for internal sandbox build ....
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
+                    else
+                        echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
+                    fi
+                '''
+            }
+      }
+
+        stage("Helm Package App (master)") {
             agent {
                 node {
                     label "jenkins-agent-helm"
@@ -222,6 +293,60 @@ pipeline {
                 }
 
             }
+        }
+        stage("Validate Deployment") {
+            failFast true
+            parallel {
+                stage("sandbox - validate deployment"){
+                    options {
+                         skipDefaultCheckout(true)
+                     }
+                    agent {
+                         node {
+                             label "master"
+                         }
+                     }
+                    when {
+                         expression { GIT_BRANCH.startsWith("dev") || GIT_BRANCH.startsWith("feature") || GIT_BRANCH.startsWith("fix") }
+                     }
+                    steps {
+                        sh '''
+                            set +x
+                            COUNTER=0
+                            DELAY=20
+                            MAX_COUNTER=60
+                            echo "Validating deployment of ${APP_NAME} in project ${TARGET_NAMESPACE}"
+                            LATEST_DC_VERSION=\$(oc get dc ${APP_NAME} -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
+                            RC_NAME=${APP_NAME}-\${LATEST_DC_VERSION}
+                            set +e
+                            while [ \$COUNTER -lt \$MAX_COUNTER ]
+                            do
+                              RC_ANNOTATION_RESPONSE=\$(oc get rc -n ${TARGET_NAMESPACE} \$RC_NAME --template="{{.metadata.annotations}}")
+                              echo "\$RC_ANNOTATION_RESPONSE" | grep openshift.io/deployment.phase:Complete >/dev/null 2>&1
+                              if [ \$? -eq 0 ]; then
+                                echo "Deployment Succeeded!"
+                                break
+                              fi
+                              echo "\$RC_ANNOTATION_RESPONSE" | grep -E 'openshift.io/deployment.phase:Failed|openshift.io/deployment.phase:Cancelled' >/dev/null 2>&1
+                              if [ \$? -eq 0 ]; then
+                                echo "Deployment Failed"
+                                exit 1
+                              fi
+                              if [ \$COUNTER -lt \$MAX_COUNTER ]; then
+                                echo -n "."
+                                COUNTER=\$(( \$COUNTER + 1 ))
+                              fi
+                              if [ \$COUNTER -eq \$MAX_COUNTER ]; then
+                                echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
+                                exit 1
+                              fi
+                              sleep \$DELAY
+                            done
+                            set -e
+                         '''
+                     }
+                 }
+             }
         }
 
         stage('Trigger System Tests') {
