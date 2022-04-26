@@ -60,7 +60,7 @@ mysql:
 managedDatabase:
   #enabled: false to use in-cluster database
   #enabled: true to use managed RDBMS database
-  enabled: false
+  enabled: true
   # values will be overridden by the config repo based on the namespace
   # different values for database will be available in values-*.yaml file from the config repo
   auth:
