@@ -60,14 +60,14 @@ mysql:
 managedDatabase:
   #enabled: false to use in-cluster database
   #enabled: true to use managed RDBMS database
-  enabled: false
+  enabled: true
   # values will be overridden by the config repo based on the namespace
   # different values for database will be available in values-*.yaml file from the config repo
   auth:
-    host: dummyval
-    username: dummyval
-    database: dummyval
-    password: dummyval
+    host: badgr-mysql-test.mysql.database.azure.com
+    username: badgradmindev
+    database: badgr
+    password: zAxc%768@![DgHF0*
     port: 3306
 
 testFramework:
