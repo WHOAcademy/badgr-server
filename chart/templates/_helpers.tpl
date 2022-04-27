@@ -25,30 +25,12 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-Generate chart secret name
-*/}}
-{{- define "mysql.secretName" -}}
-{{ default (include "mysql.fullname" .) .Values.existingSecret }}
-{{- end -}}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "mysql.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-{{ default (include "mysql.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-{{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
   ********************************************************************************************************
 */}}
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "project.chart" -}}
+{{- define "badgr.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -65,14 +47,23 @@ Create chart name and version as used by the chart label.
   We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "badgr.fullname" -}}
-{{- printf "%s-%s" .Release.Name .Values.serverName | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
 {{- define "badgr.labels" -}}
-helm.sh/chart: {{ include "project.chart" . }}
+helm.sh/chart: {{ include "badgr.chart" . }}
 {{ include "badgr.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}

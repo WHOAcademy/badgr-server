@@ -49,7 +49,7 @@ install_requires, dependency_links = dependencies_from_requirements('requirement
 
 setup(
     name='badgr-server',
-    version=version,
+    version='1.6.6',
 
     package_dir={'': "apps"},
     packages=find_packages('apps'),
