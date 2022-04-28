@@ -4,6 +4,8 @@ image_namespace: whoalxp
 # likely over written by the Argo definition
 image_tag: 0.2.0
 
+serverName: badgr
+
 env:
   badgr_username: whoa
   badgr_email: whoa@who.int
@@ -59,18 +61,17 @@ mysql:
     password: password  # TODO: encrypt data 
 
 managed_mysql:
-  default:
-    # disabled: true - to use in-cluster database
-    # disabled: false - use managed RDBMS database 
-    disabled: true
-    # values will be overridden by the config repo based on the namespace
-    # different values for database will be available in values-*.yaml file from the config repo
-    auth:
-      username: 
-      password: 
-      database: 
-      host: 
-      port: 3306
+  # disabled: true - to use in-cluster database
+  # disabled: false - use managed RDBMS database 
+  disabled: true
+  # values will be overridden by the config repo based on the namespace
+  # different values for database will be available in values-*.yaml file from the config repo
+  auth:
+    username: 
+    password: 
+    database: 
+    host: 
+    port: 3306
 
 hpa:
   enabled: false
