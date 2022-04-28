@@ -1,0 +1,89 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: {{ include "badgr.fullname" . }}
+  labels:
+    {{- include "badgr.labels" . | nindent 4 }}
+spec:
+  triggers:
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    {{- include "badgr.selectorLabels" . | nindent 4 }}
+  template:
+    metadata:
+      labels:
+        {{- include "badgr.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - resources:
+            requests:
+              cpu: {{ .Values.hpa.cpuTarget }}
+              memory: {{ .Values.hpa.memTarget }}
+            limits:
+              cpu: {{ .Values.hpa.cpuLimit }}
+              memory: {{ .Values.hpa.memLimit }}
+        terminationMessagePath: /dev/termination-log
+        name: {{ include "badgr.name" . }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          timeoutSeconds: 3
+        env:
+        {{- if .Values.managed_mysql.disabled }}
+          - name: MYSQL_DB_HOST
+            value: "{{ .Release.Name }}-mysql"
+          - name: MYSQL_DB_NAME
+            value: {{ .Values.mysql.auth.database }}
+          - name: MYSQL_DB_USER
+            value: {{ .Values.mysql.auth.username }}
+          - name: MYSQL_DB_PASSWORD
+            value: {{ .Values.mysql.auth.password }}
+        {{- else }}
+          - name: MYSQL_DB_HOST
+            value: {{ .Values.managed_mysql.auth.host }}
+          - name: MYSQL_DB_USER
+            value: {{ .Values.managed_mysql.auth.user }}
+          - name: MYSQL_DB_NAME
+            value: {{ .Values.managed_mysql.auth.database }}
+          - name: MYSQL_DB_PASSWORD
+            value: {{ .Values.managed_mysql.auth.password }}
+        {{- end }}
+          - name: BADGR_USERNAME
+            value: {{ .Values.env.badgr_username }}
+          - name: BADGR_EMAIL
+            value: {{ .Values.env.badgr_email }}
+          - name: BADGR_PASSWORD
+            value: {{ .Values.env.badgr_password }}
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+        imagePullPolicy: Always
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: "badgr-media"
+          mountPath: {{ .Values.storage.mountPath }}
+        image: "{{ .Values.image_namespace }}.{{ .Values.image_repository }}/{{ .Values.image_name }}:{{ .Values.image_tag }}"
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+      volumes:
+    {{- if .Values.storage.enabled }}
+      - name: badgr-media
+        persistentVolumeClaim:
+          claimName: {{ include "badgr.fullname" . }}
+    {{- else }}
+      - name: badgr-media
+        emptyDir: {}
+    {{- end }}

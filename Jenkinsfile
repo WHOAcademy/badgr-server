@@ -97,7 +97,7 @@ pipeline {
             steps {
                 script {
                     // TODO FIX how version is pull
-                    env.VERSION = sh(returnStdout: true, script: 'yq e .pipelineVersion chart/Chart.yaml').trim()
+                    env.VERSION = sh(returnStdout: true, script: 'yq e .appVersion chart/Chart.yaml').trim()
                     env.VERSIONED_APP_NAME = "${NAME}-${VERSION}"
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
                 }
