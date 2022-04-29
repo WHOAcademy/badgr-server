@@ -104,6 +104,7 @@ pipeline {
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
                 }
                 sh 'printenv'
+                sh '''
                 curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
                 '''
             }
