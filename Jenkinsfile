@@ -331,7 +331,7 @@ pipeline {
             }
             steps {
                 sh  '''
-                    echo "TODO - Run tests"               
+                    echo "TODO - Run tests"       
                 '''
                 build job: "system-tests/${SYSTEM_TEST_BRANCH}", parameters: [[$class: 'StringParameterValue', name: 'APP_NAME', value: "${APP_NAME}" ],[$class: 'StringParameterValue', name: 'VERSION', value: "${VERSION}"]], wait: false
             }
