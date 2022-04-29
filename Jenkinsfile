@@ -104,6 +104,8 @@ pipeline {
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
                 }
                 sh 'printenv'
+                curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                '''
             }
         }
 
@@ -124,7 +126,41 @@ pipeline {
                 }
             }
         }
-		
+	    stage("Bake (OpenShift Build)") {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label "master"
+                }
+            }
+            steps {
+                sh 'printenv'
+                echo '### Get Binary from Nexus and shove it in a box ###'
+                
+                
+                echo '### badgr ###'
+                sh  '''
+                    rm -rf ${PACKAGE}
+                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
+                    BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG} --build-arg GIT_CREDS_USR=${GIT_CREDS_USR} --build-arg GIT_CREDS_PSW=${GIT_CREDS_PSW}"
+                    echo ${BUILD_ARGS}
+                    oc delete bc ${APP_NAME}-badgr || rc=$?
+                    if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
+                        echo "🏗 Creating a sandbox build for inside the cluster 🏗"
+                        oc new-build --binary --name=${APP_NAME}-badgr -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker || rc=$?
+                        oc set build-secret --pull bc/${APP_NAME}-badgr ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME}-badgr --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                        # used for internal sandbox build ....
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}-badgr:latest ${TARGET_NAMESPACE}/${APP_NAME}-badgr:${VERSION}
+                    else
+                        echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
+                        oc new-build --binary --name=${APP_NAME}-badgr -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
+                        oc set build-secret --pull bc/${APP_NAME}-badgr ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME}-badgr --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                    fi
+                '''
         stage("Helm Package App (master)") {
             agent {
                 node {
@@ -144,11 +180,14 @@ pipeline {
                     
                     # probs point to the image inside ocp cluster or perhaps an external repo?
                     # yq e ".orchestrator.image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
+                    yq e ".namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
+                    yq e ".image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
+                    yq e '.image_name = (env(APP_NAME) + "-badgr")' -i chart/values.yaml
                     yq e ".image_namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
                     
                     # latest built image
-                    yq e ".image_tag = env(VERSION)" -i chart/values.yaml
-                    yq e ".image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
+                    yq e ".app_tag = env(VERSION)" -i chart/values.yaml
+                    
                 '''
                 sh 'printenv'
                 sh '''
