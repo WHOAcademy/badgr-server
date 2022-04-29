@@ -240,9 +240,9 @@ pipeline {
                             COUNTER=0
                             DELAY=10
                             MAX_COUNTER=60
-                            echo "Validating deployment of ${APP_NAME} in project ${TARGET_NAMESPACE}"
-                            LATEST_DC_VERSION=\$(oc get dc ${APP_NAME} -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
-                            RC_NAME=${APP_NAME}-\${LATEST_DC_VERSION}
+                            echo "Validating deployment of ${APP_NAME}-badgr in project ${TARGET_NAMESPACE}"
+                            LATEST_DC_VERSION=\$(oc get dc ${APP_NAME}-badgr -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
+                            RC_NAME=${APP_NAME}-badgr-\${LATEST_DC_VERSION}
                             set +e
                             while [ \$COUNTER -lt \$MAX_COUNTER ]
                             do
