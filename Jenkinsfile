@@ -88,7 +88,7 @@ pipeline {
             }
         }
 
-          stage("Build (Compile App)") {
+        stage("Build (Compile App)") {
             agent {
                 node {
                     label "jenkins-agent-helm"
@@ -123,7 +123,7 @@ pipeline {
             }
         }
 
-  stage("Helm Package App (master)") {
+        stage("Helm Package App (master)") {
             agent {
                 node {
                     label "jenkins-agent-helm"
@@ -238,8 +238,8 @@ pipeline {
                         sh '''
                             set +x
                             COUNTER=0
-                            DELAY=5
-                            MAX_COUNTER=180
+                            DELAY=10
+                            MAX_COUNTER=60
                             echo "Validating deployment of ${APP_NAME} in project ${TARGET_NAMESPACE}"
                             LATEST_DC_VERSION=\$(oc get dc ${APP_NAME} -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
                             RC_NAME=${APP_NAME}-\${LATEST_DC_VERSION}
