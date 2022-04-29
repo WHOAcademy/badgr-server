@@ -105,7 +105,9 @@ pipeline {
                 }
                 sh 'printenv'
                 sh '''
+                
                 curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                
                 '''
             }
         }
@@ -162,6 +164,8 @@ pipeline {
                         oc start-build ${APP_NAME}-badgr --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                     fi
                 '''
+            }
+        }        
         stage("Helm Package App (master)") {
             agent {
                 node {
@@ -315,6 +319,25 @@ pipeline {
                         '''
                     }
                 }
+            }
+        }
+        stage('Trigger System Tests') {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label 'master'
+                }
+            }
+            when {
+                expression { GIT_BRANCH.startsWith('master') || GIT_BRANCH.startsWith("main") }
+            }
+            steps {
+                sh  '''
+                    echo "TODO - Run tests"
+                '''
+                build job: "system-tests/${SYSTEM_TEST_BRANCH}", parameters: [[$class: 'StringParameterValue', name: 'APP_NAME', value: "${APP_NAME}" ], [$class: 'StringParameterValue', name: 'VERSION', value: "${VERSION}"]], wait: false
             }
         }
     }
