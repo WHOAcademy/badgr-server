@@ -80,8 +80,10 @@ pipeline {
                         script {
                             env.APP_ENV = "dev"
                             // Sandbox registry deets
+                            env.IMAGE_REPOSITORY = 'image-registry.openshift-image-registry.svc:5000'
+                            // ammend the name to create 'sandbox' deploys based on current branch
                             env.APP_NAME = "${GIT_BRANCH}-${NAME}".replace("/", "-").toLowerCase()
-                            env.TARGET_NAMESPACE = "labs-dev"
+                            env.TARGET_NAMESPACE = "${PROJECT}-" + env.APP_ENV
                         }
                     }
                 }
@@ -122,7 +124,44 @@ pipeline {
                 }
             }
         }
-
+		
+        stage("Bake (OpenShift Build)") {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label "master"
+                }
+            }
+            steps {
+                sh 'printenv'
+                echo '### Get Binary from Nexus and shove it in a box ###'
+                sh  '''
+                    rm -rf package-contents*
+                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
+                    tar -xvf ${PACKAGE}
+                    BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG}"
+                    echo ${BUILD_ARGS}
+                    # oc get bc ${APP_NAME} || rc=$?
+                    # dirty hack so i don't have to oc patch the bc for the new version when pushing to quay ...
+                    oc delete bc ${APP_NAME} || rc=$?
+                    if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
+                        echo "🏗 Creating a sandbox build for inside the cluster 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
+                        # used for internal sandbox build ....
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
+                    else
+                        echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
+                    fi
+                '''
+            }
+      }
         stage("Helm Package App (master)") {
             agent {
                 node {
@@ -132,6 +171,9 @@ pipeline {
             steps {
                 sh 'printenv'
                 sh '''
+                    helm lint chart
+                '''
+                sh '''
                     # might be overkill...
                     yq e ".appVersion = env(VERSION)" -i chart/Chart.yaml
                     yq e ".version = env(VERSION)" -i chart/Chart.yaml
@@ -139,10 +181,11 @@ pipeline {
                     
                     # probs point to the image inside ocp cluster or perhaps an external repo?
                     # yq e ".orchestrator.image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
-                    yq e ".namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
+                    yq e ".image_namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
                     
                     # latest built image
-                    yq e ".app_tag = env(VERSION)" -i chart/values.yaml
+                    yq e ".image_tag = env(VERSION)" -i chart/values.yaml
+                    yq e ".image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
                 '''
                 sh 'printenv'
                 sh '''
@@ -200,10 +243,8 @@ pipeline {
                             git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@${ARGOCD_CONFIG_REPO} config-repo
                             cd config-repo
                             git checkout ${ARGOCD_CONFIG_REPO_BRANCH}
-                            # yq - Select and update matching values in map
-                            # https://mikefarah.gitbook.io/yq/v/v4.x/operators/select#select-and-update-matching-values-in-map
                             yq e '(.applications.[] |= select(.name == ("test-" + env(NAME))) |= .source_ref = env(VERSION)' -i $ARGOCD_CONFIG_REPO_PATH
-                            git config --global user.email "jenkins@rht-labs.bot.com"
+                            git config --global user.email "jenkins@academy.who.int"
                             git config --global user.name "Jenkins"
                             git config --global push.default simple
                             git add ${ARGOCD_CONFIG_REPO_PATH}
@@ -238,7 +279,7 @@ pipeline {
                         sh '''
                             set +x
                             COUNTER=0
-                            DELAY=10
+                            DELAY=5
                             MAX_COUNTER=60
                             echo "Validating deployment of ${APP_NAME}-badgr in project ${TARGET_NAMESPACE}"
                             LATEST_DC_VERSION=\$(oc get dc ${APP_NAME}-badgr -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
