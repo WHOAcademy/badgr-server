@@ -125,43 +125,6 @@ pipeline {
             }
         }
 		
-        stage("Bake (OpenShift Build)") {
-            options {
-                skipDefaultCheckout(true)
-            }
-            agent {
-                node {
-                    label "master"
-                }
-            }
-            steps {
-                sh 'printenv'
-                echo '### Get Binary from Nexus and shove it in a box ###'
-                sh  '''
-                    rm -rf package-contents*
-                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
-                    tar -xvf ${PACKAGE}
-                    BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG}"
-                    echo ${BUILD_ARGS}
-                    # oc get bc ${APP_NAME} || rc=$?
-                    # dirty hack so i don't have to oc patch the bc for the new version when pushing to quay ...
-                    oc delete bc ${APP_NAME} || rc=$?
-                    if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
-                        echo "🏗 Creating a sandbox build for inside the cluster 🏗"
-                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker
-                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
-                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
-                        # used for internal sandbox build ....
-                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
-                    else
-                        echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
-                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
-                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
-                        oc start-build ${APP_NAME} --from-dir=${VERSIONED_APP_NAME}/. ${BUILD_ARGS} --follow
-                    fi
-                '''
-            }
-      }
         stage("Helm Package App (master)") {
             agent {
                 node {
