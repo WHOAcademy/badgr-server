@@ -63,18 +63,18 @@ mysql:
 managed_mysql:
   # disabled: true - to use in-cluster database
   # disabled: false - use managed RDBMS database 
-  disabled: true
+  disabled: false
   # values will be overridden by the config repo based on the namespace
   # different values for database will be available in values-*.yaml file from the config repo
   auth:
-    username: 
-    password: 
-    database: 
-    host: 
+    username: badgradmindev
+    password: zAxc%768@![DgHF0*
+    database: badgr
+    host: badgr-mysql-test.mysql.database.azure.com
     port: 3306
 
 hpa:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 5
   cpuTarget: 200m
