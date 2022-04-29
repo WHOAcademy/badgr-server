@@ -67,10 +67,10 @@ managed_mysql:
   # values will be overridden by the config repo based on the namespace
   # different values for database will be available in values-*.yaml file from the config repo
   auth:
-    username: 
-    password: 
-    database: 
-    host: 
+    username:
+    password:
+    database:
+    host:
     port: 3306
 
 hpa:
