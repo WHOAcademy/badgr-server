@@ -105,7 +105,7 @@ pipeline {
                 }
                 sh 'printenv'
                 sh '''
-                
+                tar -zcvf ${PACKAGE} --transform='flags=r;s|Dockerfile.openshift.test.api|Dockerfile|' --directory=badgr waf/ apps/ openshift_deployment/ etc/ ecs_deployment/  Dockerfile.openshift.test.api manage.py requirements.txt
                 curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
                 
                 '''
@@ -149,19 +149,19 @@ pipeline {
                     curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
                     BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG} --build-arg GIT_CREDS_USR=${GIT_CREDS_USR} --build-arg GIT_CREDS_PSW=${GIT_CREDS_PSW}"
                     echo ${BUILD_ARGS}
-                    oc delete bc ${APP_NAME}-badgr || rc=$?
+                    oc delete bc ${APP_NAME} || rc=$?
                     if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
                         echo "🏗 Creating a sandbox build for inside the cluster 🏗"
-                        oc new-build --binary --name=${APP_NAME}-badgr -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker || rc=$?
-                        oc set build-secret --pull bc/${APP_NAME}-badgr ${REGISTRY_PUSH_SECRET}
-                        oc start-build ${APP_NAME}-badgr --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker || rc=$?
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                         # used for internal sandbox build ....
-                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}-badgr:latest ${TARGET_NAMESPACE}/${APP_NAME}-badgr:${VERSION}
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
                     else
                         echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
-                        oc new-build --binary --name=${APP_NAME}-badgr -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
-                        oc set build-secret --pull bc/${APP_NAME}-badgr ${REGISTRY_PUSH_SECRET}
-                        oc start-build ${APP_NAME}-badgr --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                     fi
                 '''
             }
