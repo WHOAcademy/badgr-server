@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         // GLobal Vars
-        NAME = "badgr-server"
+        NAME = "badgr"
         PROJECT= "labs"
 
         // Config repo managed by ArgoCD details
