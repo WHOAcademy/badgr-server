@@ -83,7 +83,7 @@ pipeline {
                             env.IMAGE_REPOSITORY = 'image-registry.openshift-image-registry.svc:5000'
                             // ammend the name to create 'sandbox' deploys based on current branch
                             env.APP_NAME = "${GIT_BRANCH}-${NAME}".replace("/", "-").toLowerCase()
-                            env.TARGET_NAMESPACE = "${PROJECT}-" + env.APP_ENV
+                            env.TARGET_NAMESPACE = "labs-dev"
                         }
                     }
                 }
@@ -160,7 +160,7 @@ pipeline {
                         oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
                     else
                         echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
-                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
                         oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
                         oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                     fi
