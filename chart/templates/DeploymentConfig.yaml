@@ -72,7 +72,7 @@ spec:
           volumeMounts:
           - name: "badgr-media"
             mountPath: {{ .Values.storage.mountPath }}
-          image: "{{ .Values.image_namespace }}.{{ .Values.image_repository }}/{{ .Values.image_name }}:{{ .Values.image_tag }}"
+          image: {{ include "badgr-server.image_name" . }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

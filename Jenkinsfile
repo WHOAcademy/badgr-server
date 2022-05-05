@@ -105,8 +105,8 @@ pipeline {
                 }
                 sh 'printenv'
                 sh '''
-                mv .docker/Dockerfile.openshift.test.api .
-                tar -zcvf ${PACKAGE} --transform='flags=r;s|Dockerfile.openshift.test.api|Dockerfile|' .docker/ waf/ apps/ requirements.txt manage.py Dockerfile.openshift.test.api
+                mv .docker/Dockerfile.prod.api .
+                tar -zcvf ${PACKAGE} --transform='flags=r;s|Dockerfile.prod.api|Dockerfile|' .docker/ waf/ apps/ requirements.txt manage.py Dockerfile.prod.api
                 curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
                 
                 '''
@@ -160,7 +160,7 @@ pipeline {
                         oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
                     else
                         echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
-                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${IMAGE_REPOSITORY}/${APP_NAME}-badgr:${VERSION}"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
                         oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
                         oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                     fi
