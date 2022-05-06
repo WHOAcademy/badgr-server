@@ -157,7 +157,7 @@ pipeline {
                         oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
                         oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
                         # used for internal sandbox build ....
-                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}-badgr:${VERSION}
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}-badgr:0.2.0
                     else
                         echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
                         oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
