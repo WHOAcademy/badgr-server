@@ -52,7 +52,7 @@ spec:
             - name: MYSQL_DB_HOST
               value: {{ .Values.managed_mysql.auth.host }}
             - name: MYSQL_DB_USER
-              value: {{ .Values.managed_mysql.auth.user }}
+              value: {{ .Values.managed_mysql.auth.username }}
             - name: MYSQL_DB_NAME
               value: {{ .Values.managed_mysql.auth.database }}
             - name: MYSQL_DB_PASSWORD
