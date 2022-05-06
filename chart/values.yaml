@@ -57,7 +57,7 @@ mysql:
   auth:
     rootPassword: pAssw0rd
     database: badgr_server
-    username: lxp_user
+    username: my-user
     password: password  # TODO: encrypt data 
 
 managed_mysql:
