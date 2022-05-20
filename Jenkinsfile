@@ -105,9 +105,9 @@ pipeline {
                 }
                 sh 'printenv'
                 sh '''
-                #mv .docker/Dockerfile.openshift.test.api .
-                tar -zcvf ${PACKAGE} .docker/openshift_deployment .docker/etc/settings_local.prod.py waf/ apps/ requirements.txt manage.py Dockerfile
-                curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                
+                    tar -zcvf ${PACKAGE} .docker/openshift_deployment .docker/etc/settings_local.prod.py waf/ apps/ requirements.txt manage.py Dockerfile
+                    curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
                 
                 '''
             }
