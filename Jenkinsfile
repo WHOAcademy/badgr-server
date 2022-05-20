@@ -186,7 +186,6 @@ pipeline {
                     
                     # probs point to the image inside ocp cluster or perhaps an external repo?
                     # yq e ".orchestrator.image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
-                    yq e ".namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
                     yq e ".image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
                     yq e '.image_name = env(APP_NAME)' -i chart/values.yaml
                     yq e ".image_namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
