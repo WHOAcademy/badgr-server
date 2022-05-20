@@ -1,17 +1,22 @@
 {{- if .Values.route.enabled }}
-kind: Route
+---
 apiVersion: route.openshift.io/v1
+kind: Route
 metadata:
-  name: {{ include "badgr.name" . }}
+  name: {{ include "badgr.fullname" . }}
   labels:
     {{- include "badgr.labels" . | nindent 4 }}
 spec:
   {{- if .Values.route.custom_host.enabled }}
   host: {{ .Values.route.custom_host.name }}
   {{ end }}
+  port:
+    targetPort: 8080-tcp
   to:
     kind: Service
-    name: "{{ include "badgr.fullname" . }}"
+    name: {{ include "badgr.fullname" . }}
+    weight: 100
+  wildcardPolicy: None
   {{- if .Values.route.https_redirect }}
   tls:
     insecureEdgeTerminationPolicy: Redirect

@@ -80,6 +80,8 @@ pipeline {
                         script {
                             env.APP_ENV = "dev"
                             // Sandbox registry deets
+                            env.IMAGE_REPOSITORY = 'image-registry.openshift-image-registry.svc:5000'
+                            // ammend the name to create 'sandbox' deploys based on current branch
                             env.APP_NAME = "${GIT_BRANCH}-${NAME}".replace("/", "-").toLowerCase()
                             env.TARGET_NAMESPACE = "labs-dev"
                         }
@@ -88,7 +90,7 @@ pipeline {
             }
         }
 
-          stage("Build (Compile App)") {
+        stage("Build (Compile App)") {
             agent {
                 node {
                     label "jenkins-agent-helm"
@@ -97,11 +99,17 @@ pipeline {
             steps {
                 script {
                     // TODO FIX how version is pull
-                    env.VERSION = sh(returnStdout: true, script: 'yq e .pipelineVersion chart/Chart.yaml').trim()
+                    env.VERSION = sh(returnStdout: true, script: 'yq e .appVersion chart/Chart.yaml').trim()
                     env.VERSIONED_APP_NAME = "${NAME}-${VERSION}"
                     env.PACKAGE = "${VERSIONED_APP_NAME}.tar.gz"
                 }
                 sh 'printenv'
+                sh '''
+                
+                    tar -zcvf ${PACKAGE} .docker/openshift_deployment .docker/etc/settings_local.prod.py waf/ apps/ requirements.txt manage.py Dockerfile
+                    curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                
+                '''
             }
         }
 
@@ -122,8 +130,44 @@ pipeline {
                 }
             }
         }
-
-  stage("Helm Package App (master)") {
+	    stage("Bake (OpenShift Build)") {
+            options {
+                skipDefaultCheckout(true)
+            }
+            agent {
+                node {
+                    label "master"
+                }
+            }
+            steps {
+                sh 'printenv'
+                echo '### Get Binary from Nexus and shove it in a box ###'
+                
+                
+                echo '### badgr ###'
+                sh  '''
+                    rm -rf ${PACKAGE}
+                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
+                    BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG} --build-arg GIT_CREDS_USR=${GIT_CREDS_USR} --build-arg GIT_CREDS_PSW=${GIT_CREDS_PSW}"
+                    echo ${BUILD_ARGS}
+                    oc delete bc ${APP_NAME} || rc=$?
+                    if [[ $TARGET_NAMESPACE == *"dev"* ]]; then
+                        echo "🏗 Creating a sandbox build for inside the cluster 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker || rc=$?
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                        # used for internal sandbox build ....
+                        oc tag ${OPENSHIFT_BUILD_NAMESPACE}/${APP_NAME}:latest ${TARGET_NAMESPACE}/${APP_NAME}:${VERSION}
+                    else
+                        echo "🏗 Creating a potential build that could go all the way so pushing externally 🏗"
+                        oc new-build --binary --name=${APP_NAME} -l app=${APP_NAME} ${BUILD_ARGS} --strategy=docker --push-secret=${REGISTRY_PUSH_SECRET} --to-docker --to="${TARGET_NAMESPACE}.${IMAGE_REPOSITORY}/${APP_NAME}:${VERSION}"
+                        oc set build-secret --pull bc/${APP_NAME} ${REGISTRY_PUSH_SECRET}
+                        oc start-build ${APP_NAME} --from-archive=${PACKAGE} ${BUILD_ARGS} --follow
+                    fi
+                '''
+            }
+        }        
+        stage("Helm Package App (master)") {
             agent {
                 node {
                     label "jenkins-agent-helm"
@@ -132,6 +176,9 @@ pipeline {
             steps {
                 sh 'printenv'
                 sh '''
+                    helm lint chart
+                '''
+                sh '''
                     # might be overkill...
                     yq e ".appVersion = env(VERSION)" -i chart/Chart.yaml
                     yq e ".version = env(VERSION)" -i chart/Chart.yaml
@@ -139,10 +186,13 @@ pipeline {
                     
                     # probs point to the image inside ocp cluster or perhaps an external repo?
                     # yq e ".orchestrator.image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
-                    yq e ".namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
+                    yq e ".image_repository = env(IMAGE_REPOSITORY)" -i chart/values.yaml
+                    yq e '.image_name = env(APP_NAME)' -i chart/values.yaml
+                    yq e ".image_namespace = env(TARGET_NAMESPACE)" -i chart/values.yaml
                     
                     # latest built image
-                    yq e ".app_tag = env(VERSION)" -i chart/values.yaml
+                    yq e ".image_tag = env(VERSION)" -i chart/values.yaml
+                    
                 '''
                 sh 'printenv'
                 sh '''
@@ -200,10 +250,8 @@ pipeline {
                             git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@${ARGOCD_CONFIG_REPO} config-repo
                             cd config-repo
                             git checkout ${ARGOCD_CONFIG_REPO_BRANCH}
-                            # yq - Select and update matching values in map
-                            # https://mikefarah.gitbook.io/yq/v/v4.x/operators/select#select-and-update-matching-values-in-map
                             yq e '(.applications.[] |= select(.name == ("test-" + env(NAME))) |= .source_ref = env(VERSION)' -i $ARGOCD_CONFIG_REPO_PATH
-                            git config --global user.email "jenkins@rht-labs.bot.com"
+                            git config --global user.email "jenkins@academy.who.int"
                             git config --global user.name "Jenkins"
                             git config --global push.default simple
                             git add ${ARGOCD_CONFIG_REPO_PATH}
@@ -219,7 +267,60 @@ pipeline {
 
             }
         }
-
+        stage("Validate Deployment") {
+            failFast true
+            parallel {
+                stage("sandbox - validate deployment"){
+                    options {
+                        skipDefaultCheckout(true)
+                    }
+                    agent {
+                        node {
+                            label "master"
+                        }
+                    }
+                    when {
+                        expression { GIT_BRANCH.startsWith("dev") || GIT_BRANCH.startsWith("feature") || GIT_BRANCH.startsWith("fix") }
+                    }
+                    steps {
+                        sh '''
+                            set +x
+                            COUNTER=0
+                            DELAY=5
+                            MAX_COUNTER=60
+                            echo "Validating deployment of ${APP_NAME}-badgr in project ${TARGET_NAMESPACE}"
+                            LATEST_DC_VERSION=\$(oc get dc ${APP_NAME}-badgr -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
+                            RC_NAME=${APP_NAME}-badgr-\${LATEST_DC_VERSION}
+                            set +e
+                            while [ \$COUNTER -lt \$MAX_COUNTER ]
+                            do
+                              RC_ANNOTATION_RESPONSE=\$(oc get rc -n ${TARGET_NAMESPACE} \$RC_NAME --template="{{.metadata.annotations}}")
+                              echo "\$RC_ANNOTATION_RESPONSE" | grep openshift.io/deployment.phase:Complete >/dev/null 2>&1
+                              if [ \$? -eq 0 ]; then
+                                echo "Deployment Succeeded!"
+                                break
+                              fi
+                              echo "\$RC_ANNOTATION_RESPONSE" | grep -E 'openshift.io/deployment.phase:Failed|openshift.io/deployment.phase:Cancelled' >/dev/null 2>&1
+                              if [ \$? -eq 0 ]; then
+                                echo "Deployment Failed"
+                                exit 1
+                              fi
+                              if [ \$COUNTER -lt \$MAX_COUNTER ]; then
+                                echo -n "."
+                                COUNTER=\$(( \$COUNTER + 1 ))
+                              fi
+                              if [ \$COUNTER -eq \$MAX_COUNTER ]; then
+                                echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
+                                exit 1
+                              fi
+                              sleep \$DELAY
+                            done
+                            set -e
+                        '''
+                    }
+                }
+            }
+        }
         stage('Trigger System Tests') {
             options {
                 skipDefaultCheckout(true)

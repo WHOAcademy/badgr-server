@@ -39,31 +39,31 @@ spec:
             initialDelaySeconds: 3
             timeoutSeconds: 3
           env:
-          {{- if .Values.managedDatabase.enabled }}
+          {{- if .Values.managed_mysql.disabled }}
             - name: MYSQL_DB_HOST
-              value: {{ .Values.managedDatabase.host }}
-            - name: MYSQL_DB_USER
-              value: {{ .Values.managedDatabase.user }}
+              value: {{ .Release.Name }}-mysql
             - name: MYSQL_DB_NAME
-              value: {{ .Values.managedDatabase.name }}
+              value: {{ .Values.mysql.auth.database }}
+            - name: MYSQL_DB_USER
+              value: {{ .Values.mysql.auth.username }}
             - name: MYSQL_DB_PASSWORD
-              value: {{ .Values.managedDatabase.password }}
+              value: {{ .Values.mysql.auth.password }}
           {{- else }}
             - name: MYSQL_DB_HOST
-              value: {{ include "mysql.fullname" . }}
+              value: {{ .Values.managed_mysql.auth.host }}
             - name: MYSQL_DB_USER
-              value: {{ .Values.mysqlUser }}
+              value: {{ .Values.managed_mysql.auth.username }}
             - name: MYSQL_DB_NAME
-              value: {{ .Values.mysqlDatabase }}
+              value: {{ .Values.managed_mysql.auth.database }}
             - name: MYSQL_DB_PASSWORD
-              value: {{ .Values.mysqlPassword }}
+              value: {{ .Values.managed_mysql.auth.password }}
           {{- end }}
             - name: BADGR_USERNAME
-              value: {{ .Values.env.badgrUserName }}
+              value: {{ .Values.env.badgr_username }}
             - name: BADGR_EMAIL
-              value: {{ .Values.env.badgrEmail }}
+              value: {{ .Values.env.badgr_email }}
             - name: BADGR_PASSWORD
-              value: {{ .Values.env.badgrPassword }}
+              value: {{ .Values.env.badgr_password }}
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -71,15 +71,15 @@ spec:
           terminationMessagePolicy: File
           volumeMounts:
           - name: "badgr-media"
-            mountPath: {{ .Values.badgr_storage.mountPath }}
-          image: "{{ .Values.badgr_image_namespace }}.{{ .Values.badgr_image_repository }}/{{ .Values.badgr_image_name }}:{{ .Values.badgr_image_tag }}"
+            mountPath: {{ .Values.storage.mountPath }}
+          image: {{ include "badgr-server.image_name" . }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
       schedulerName: default-scheduler
       volumes:
-    {{- if .Values.badgr_storage.enabled }}
+    {{- if .Values.storage.enabled }}
       - name: badgr-media
         persistentVolumeClaim:
           claimName: {{ include "badgr.fullname" . }}
