@@ -39,6 +39,8 @@ spec:
             initialDelaySeconds: 3
             timeoutSeconds: 3
           env:
+          {{- if .Values.sealed_secrets.disabled }}
+
           {{- if .Values.managed_mysql.disabled }}
             - name: MYSQL_DB_HOST
               value: {{ .Release.Name }}-mysql
@@ -64,6 +66,65 @@ spec:
               value: {{ .Values.env.badgr_email }}
             - name: BADGR_PASSWORD
               value: {{ .Values.env.badgr_password }}
+          {{- else }}
+          # If we are using sealed secrets
+            - name: BADGR_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: badgr_username
+                  name: "{{ include "badgr.fullname" . }}-app-secret"
+            - name: BADGR_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  key: badgr_email
+                  name: "{{ include "badgr.fullname" . }}-app-secret"
+            - name: BADGR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: badgr_password
+                  name: "{{ include "badgr.fullname" . }}-app-secret"
+          {{- if .Values.managed_mysql.disabled }}
+            - name: MYSQL_DB_HOST
+              value: {{ .Release.Name }}-mysql              
+            - name: MYSQL_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_name
+                  name: "{{ include "badgr.fullname" . }}-incluster-secret"
+            - name: MYSQL_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_user
+                  name: "{{ include "badgr.fullname" . }}-incluster-secret"
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_password
+                  name: "{{ include "badgr.fullname" . }}-incluster-secret"
+          {{- else }}
+            - name: MYSQL_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_host
+                  name: "{{ include "badgr.fullname" . }}-managed-secret"                
+            - name: MYSQL_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_name
+                  name: "{{ include "badgr.fullname" . }}-managed-secret"
+            - name: MYSQL_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_user
+                  name: "{{ include "badgr.fullname" . }}-managed-secret"
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mysql_db_password
+                  name: "{{ include "badgr.fullname" . }}-managed-secret"
+          {{- end }}          
+          {{- end }}
+
           ports:
             - containerPort: 8080
               protocol: TCP

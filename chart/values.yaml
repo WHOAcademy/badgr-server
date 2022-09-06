@@ -7,9 +7,9 @@ image_tag: 0.2.0
 serverName: badgr
 
 env:
-  badgr_username: whoa
-  badgr_email: whoa@who.int
-  badgr_password: YH5931FW29MREPJMJAF4OAMQQK9V528X9TDV5H1U
+  badgr_username: 
+  badgr_email: 
+  badgr_password: 
 
 # File storage settings
 # https://github.com/WHOAcademy/lxp-docs/blob/master/docs/Creating_new_storageclass.adoc
@@ -19,6 +19,17 @@ storage:
   storageClassName: azure-file-storage
   mountPath: /badgr_server/mediafiles
 
+sealed_secrets:
+  disabled: false
+  mysql:
+    mysql_db_host: 
+    mysql_db_name: AgCcL1CZBwbzdK72pDaNXDXg7iOcNGQ8DkMOZXqtZBg8dAifbj1uAHhHQmO2/v4bP/311sF4k/VjzOKAdTE3hIq9CLZxxuM3o36mj+j9YWWff5BSQxowOeOxQvs2/Kw7pvOJE4UmLWO9mpWtjd39o8S0ZOcWMnTuLZCPUk0SoYKl5uioQJcNq9JU1MZ7aC0H4PwykT0jN7gHlOpA4gA78uPrqwqohK3jZ4p+kDbVnvOI2Z74kVe0Nwac+pw5pljbfS0srVqS7qCY/Sxv8p06965Jtm+owU8nPCTogycNdjOzB1UsVfp0DQ4vWuAa2qvxu0q4I8nY85kBerENiLym/qvc/YVvB5ql1pKplmJE6ReuWjIZSPvwfrtYmXFjk075Tu/dV0+vAQS0NG5DzASebV7X1OB9VSi/NKK2FLxktVJKncmu/N1wT11Gp0dfLAr/33gqmFv8Pmzc+XzBoNsaFA+vPgdjPZ2pVRHxF065WYDL74/xIV/edhb2FPs4tX3pvkMCvb+Re+Ay/TUJ31Y2VEMHo+ubzEXuWkVJUVxFvD+zFwbRbn7ihcit+aYKTG09isD1uL73z94JU5h4rb4inVip6CE+LINpnUNQncrd9iLY8Q7Mxpzsg+L1eLGoWXE744x+KB0TyFmu1W7idnwayifEk35n7yN/lTgjBJ43iIafd5hhbiI0YJ0oT8UND3qwNIA+xiS+nhXKbuw+Hp8LwjIf
+    mysql_db_user: AgDB8q1yUETKZAafyoQ+QhAeyqrljg8EanP8HC3eJX0BvSGUF5QR49JS29fzndQiebF0hXU3YqgOqRQ1E1z7hnDqns2829fNGILKVZEcfTDL+nYzfC/M6DhpFGI/IuZz63P1QDr11QUhBybULPVdcLSTY39yhzUcIq4OMe8nkO+o+wha7ZNu/s9EzsV2pBFSvWJeuRWndqvwEbdUvaXHfqf3p1sBFh5NLCfD8W9j2OgyzBxSNaQLvZA/Da+UrE1W8YpKSbYLmf6BY0Z7+6/ES1/JTudPi0cmOOw9xTVcqWR7X7rfHs3SU112i36hcT2+k5dr+imKdu5GzW1hzYnCOa9PIt8+Y+9XORHos3DoXqbjIc/9qRn++wx51NNVYBE6xAg94hm5aV3R3BI/Iv9c4z91EYEFhpgtUrN0kuyFmRlRyLaHIYIww1JfhbUCCHiVZUZvgg7EggB0D/kTLEGFL6HEu9APew9MB9WMBiKRnOmI5CpZPO2/SUrkWuVHNaZ7W6kRzrhSWTmlLEI1VPXoCPdA4DUfeS+vqjompvtcPr2ni3CWwwfQdNZTxbWpfws3B6nIDorZf0CTdGQV+UxlXsFrz5TiJkRGdh4A12DBrutdjCFjBIDPMCCDsraGGeWVL0UTzMM2XX33WG1CCqiGG0GZmxBV+oDoviWDA7XdFZ7X5vFUzlCADCbw6uiBAPO3inx9s3eJW5zeBPl8ICYCCh6TmzzrRaIfblMhKavoLQjVrIa4OqJO9st7Y4KUw5wmEoO7LQ==
+    mysql_db_password: AgBFfn+ScKPKFxp9PVKe1IaIEQ6w/k+t85fUD3fR6jRV6ONNqbaXz3+bsaP91YR0V535br3ntg1KjdPuYXwxsGeXLNBEQevuqMEeOZ0o61Kb7ZJF2lx2B2X2zWadBGebJrBNpjFoeAkSbNMeVbqabrMtmM4S7VubR4Ns6ElsH3QdQWGeLoqIys4ncn37wiwt4130TFNjRoFnHSaYwjr46x8+ZlaOaycIjmTdba8aJ8CfnZeEFCQ0yOECdw81ZvcxfEm2aVKBfeKEHk4t9VsxwFe9YoeBal82K1TJd3xexGqQTLHGEMmanmI53Fd/k4NXZ/O9tOKNoxRAbk8CLpzCLgujlyUah+jRpmnhuHWAuDn/uPg9G0vpm/RMXwT7qinjwy8YzMq7zZ9zS6nINylDSagZBoXk07SgVbwtARthxuY08+Qz8G2DK+DioZs1FACWntpiqSBYY7oBE366B7O3Q5Kvpk+6/gXjBMUzaC/f+BKsIr/f1RnyGXKS9tPGSpbVj+MXAI2bmOOMzlXVhV4GM8PT1afoEssaRgBmsGFa0XLq+xu6YhsiRsUkCGmTPH7x3Cz7Vm4AcqwOY8ZNY2C3tiOUFNAezMuv7pz72FNsxeyiSAq4nSeC+xhJ8jfRSDrHzPzsyl9XMPIJvuKAdNrJVT8nHwlMMv3xkotIpjiX3yEgqSgND6vhXCndAgc4pKmjDbTaH5ejZsosAkA51BhN8g==
+  app:
+    badgr_username:
+    badgr_email:
+    badgr_password: 
 
 # OCP route
 route: 
@@ -55,10 +66,10 @@ mysql:
     service:
       port: 3306
   auth:
-    rootPassword: pAssw0rd
-    database: badgr_server
-    username: my-user
-    password: password  # TODO: encrypt data 
+    rootPassword: 
+    database: 
+    username: 
+    password: 
 
 managed_mysql:
   # disabled: true - to use in-cluster database
@@ -67,11 +78,11 @@ managed_mysql:
   # values will be overridden by the config repo based on the namespace
   # different values for database will be available in values-*.yaml file from the config repo
   auth:
-    username: badgradmindev
-    password: zAxc%768@![DgHF0*
-    database: badgr
-    host: badgr-mysql-test.mysql.database.azure.com
-    port: 3306
+    username: 
+    password: 
+    database: 
+    host: 
+    port: 
 
 hpa:
   enabled: false

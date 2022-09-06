@@ -222,11 +222,13 @@ pipeline {
                         // TODO - if SANDBOX, create release in rando ns
                         sh 'printenv'
                         sh 'ls'
+                        // We Remove installation because jenkins should not have access to sealed secrets
                         sh '''
                             # helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} --dry-run
-                            helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} || rc=$?
-                            sleep 40
-                            helm upgrade --install ${APP_NAME} \
+                            # helm uninstall ${APP_NAME} --namespace=${TARGET_NAMESPACE} || rc=$?
+                            # sleep 40
+
+                            echo helm upgrade --install ${APP_NAME} \
                                 --namespace=${TARGET_NAMESPACE} \
                                 http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_HELM}/${APP_NAME}-${VERSION}.tgz
                         '''
@@ -267,60 +269,60 @@ pipeline {
 
             }
         }
-        stage("Validate Deployment") {
-            failFast true
-            parallel {
-                stage("sandbox - validate deployment"){
-                    options {
-                        skipDefaultCheckout(true)
-                    }
-                    agent {
-                        node {
-                            label "master"
-                        }
-                    }
-                    when {
-                        expression { GIT_BRANCH.startsWith("dev") || GIT_BRANCH.startsWith("feature") || GIT_BRANCH.startsWith("fix") }
-                    }
-                    steps {
-                        sh '''
-                            set +x
-                            COUNTER=0
-                            DELAY=5
-                            MAX_COUNTER=60
-                            echo "Validating deployment of ${APP_NAME}-badgr in project ${TARGET_NAMESPACE}"
-                            LATEST_DC_VERSION=\$(oc get dc ${APP_NAME}-badgr -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
-                            RC_NAME=${APP_NAME}-badgr-\${LATEST_DC_VERSION}
-                            set +e
-                            while [ \$COUNTER -lt \$MAX_COUNTER ]
-                            do
-                              RC_ANNOTATION_RESPONSE=\$(oc get rc -n ${TARGET_NAMESPACE} \$RC_NAME --template="{{.metadata.annotations}}")
-                              echo "\$RC_ANNOTATION_RESPONSE" | grep openshift.io/deployment.phase:Complete >/dev/null 2>&1
-                              if [ \$? -eq 0 ]; then
-                                echo "Deployment Succeeded!"
-                                break
-                              fi
-                              echo "\$RC_ANNOTATION_RESPONSE" | grep -E 'openshift.io/deployment.phase:Failed|openshift.io/deployment.phase:Cancelled' >/dev/null 2>&1
-                              if [ \$? -eq 0 ]; then
-                                echo "Deployment Failed"
-                                exit 1
-                              fi
-                              if [ \$COUNTER -lt \$MAX_COUNTER ]; then
-                                echo -n "."
-                                COUNTER=\$(( \$COUNTER + 1 ))
-                              fi
-                              if [ \$COUNTER -eq \$MAX_COUNTER ]; then
-                                echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
-                                exit 1
-                              fi
-                              sleep \$DELAY
-                            done
-                            set -e
-                        '''
-                    }
-                }
-            }
-        }
+        // stage("Validate Deployment") {
+        //     failFast true
+        //     parallel {
+        //         stage("sandbox - validate deployment"){
+        //             options {
+        //                 skipDefaultCheckout(true)
+        //             }
+        //             agent {
+        //                 node {
+        //                     label "master"
+        //                 }
+        //             }
+        //             when {
+        //                 expression { GIT_BRANCH.startsWith("dev") || GIT_BRANCH.startsWith("feature") || GIT_BRANCH.startsWith("fix") }
+        //             }
+        //             steps {
+        //                 sh '''
+        //                     set +x
+        //                     COUNTER=0
+        //                     DELAY=5
+        //                     MAX_COUNTER=60
+        //                     echo "Validating deployment of ${APP_NAME}-badgr in project ${TARGET_NAMESPACE}"
+        //                     LATEST_DC_VERSION=\$(oc get dc ${APP_NAME}-badgr -n ${TARGET_NAMESPACE} --template='{{ .status.latestVersion }}')
+        //                     RC_NAME=${APP_NAME}-badgr-\${LATEST_DC_VERSION}
+        //                     set +e
+        //                     while [ \$COUNTER -lt \$MAX_COUNTER ]
+        //                     do
+        //                       RC_ANNOTATION_RESPONSE=\$(oc get rc -n ${TARGET_NAMESPACE} \$RC_NAME --template="{{.metadata.annotations}}")
+        //                       echo "\$RC_ANNOTATION_RESPONSE" | grep openshift.io/deployment.phase:Complete >/dev/null 2>&1
+        //                       if [ \$? -eq 0 ]; then
+        //                         echo "Deployment Succeeded!"
+        //                         break
+        //                       fi
+        //                       echo "\$RC_ANNOTATION_RESPONSE" | grep -E 'openshift.io/deployment.phase:Failed|openshift.io/deployment.phase:Cancelled' >/dev/null 2>&1
+        //                       if [ \$? -eq 0 ]; then
+        //                         echo "Deployment Failed"
+        //                         exit 1
+        //                       fi
+        //                       if [ \$COUNTER -lt \$MAX_COUNTER ]; then
+        //                         echo -n "."
+        //                         COUNTER=\$(( \$COUNTER + 1 ))
+        //                       fi
+        //                       if [ \$COUNTER -eq \$MAX_COUNTER ]; then
+        //                         echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
+        //                         exit 1
+        //                       fi
+        //                       sleep \$DELAY
+        //                     done
+        //                     set -e
+        //                 '''
+        //             }
+        //         }
+        //     }
+        // }
         stage('Trigger System Tests') {
             options {
                 skipDefaultCheckout(true)
