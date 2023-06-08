@@ -13,10 +13,10 @@ appVersion: 1.7.0
 home: https://github.com/WHOAcademy/badgr-server
 
 dependencies:
-- name: mysql
-  version: "8.8.26"
-  repository: "https://charts.bitnami.com/bitnami"
-  condition: managed_mysql.disabled
+- name: bitnami-mysql
+  version: "1.0.1"
+  repository: "https://whoacademy.github.io/helm-charts"
+  alias: mysql
 
 maintainers:
   - name: gkmahendran09 
