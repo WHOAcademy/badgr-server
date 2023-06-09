@@ -26,14 +26,16 @@ services:
 
   # this container runs mysql (database)
   db:
-    image: mysql:5.6.39
+    image: mysql:5.7.31
     volumes:
       - badgr_server_prod_db:/var/lib/mysql:rw
       - ./.docker/etc/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
+      - "MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password"
+      - "MYSQL_ROOT_PASSWORD=pAssw0rd"
+      - "MYSQL_DATABASE=badgr_server"
+      - "MYSQL_USER=my-user"
       - "MYSQL_PASSWORD=password"
-      - "MYSQL_HOST=db"
-      - "MYSQL_ROOT_PASSWORD=password"
     expose:
       - "3306"
     networks:
