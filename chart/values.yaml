@@ -37,24 +37,23 @@ route:
 # https://artifacthub.io/packages/helm/bitnami/mysql#parameters
 mysql:
   primary:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
     persistence:
-      enabled: true
-      size: 1Gi
-    readinessProbe:
       enabled: false
-    livenessProbe:
-      enabled: false
-    startupProbe:
-      enabled: false
+    service:
+      port: 3306
   secondary:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
     persistence:
       enabled: false
-    readinessProbe:
-      enabled: false
-    livenessProbe:
-      enabled: false
-    startupProbe:
-      enabled: false
+    service:
+      port: 3306
   auth:
     rootPassword: pAssw0rd
     database: badgr_server
