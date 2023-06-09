@@ -17,6 +17,7 @@ dependencies:
   version: "1.0.1"
   repository: "https://whoacademy.github.io/helm-charts"
   alias: mysql
+  condition: managed_mysql.disabled
 
 maintainers:
   - name: gkmahendran09 
