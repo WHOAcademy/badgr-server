@@ -41,9 +41,9 @@ spec:
           env:
           {{- if .Values.managed_mysql.disabled }}
             - name: MYSQL_DB_HOST
-              value: {{ .Release.Name }}-mysql
+              value: {{ .Release.Name }}
             - name: MYSQL_HOST
-              value: {{ .Release.Name }}-mysql
+              value: {{ .Release.Name }}
             - name: MYSQL_DB_NAME
               value: {{ .Values.mysql.auth.database }}
             - name: MYSQL_DB_USER
