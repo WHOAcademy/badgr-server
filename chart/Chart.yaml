@@ -8,14 +8,15 @@ version: 1.7.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 1.7.0
+appVersion: 1.7.1
 
 home: https://github.com/WHOAcademy/badgr-server
 
 dependencies:
-- name: mysql
-  version: "8.8.26"
-  repository: "https://charts.bitnami.com/bitnami"
+- name: bitnami-mysql
+  version: "1.0.1"
+  repository: "https://whoacademy.github.io/helm-charts"
+  alias: mysql
   condition: managed_mysql.disabled
 
 maintainers:
