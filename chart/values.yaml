@@ -81,4 +81,4 @@ hpa:
   cpuTarget: 200m
   memTarget: 750Mi
   cpuLimit: 400m
-  memLimit: 1.5Gi
+  memLimit: 1536Mi
