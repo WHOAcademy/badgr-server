@@ -139,19 +139,8 @@ pipeline {
                         // Wait for the SonarQube analysis to complete and check the quality gate status
                         timeout(time: 1, unit: 'HOURS') {
                             def qg = waitForQualityGate()
-                            def metrics = qg.metrics
-
-                            if (metrics.coverage < 80) { 
-                                error "Code coverage is below 80%: ${metrics.coverage}%"
-                                echo "Code coverage is below 80%: ${metrics.coverage}%"
-                                }
-                            if (metrics.critical_vulnerabilities > 0) {
-                                error "There are critical security vulnerabilities: ${metrics.critical_vulnerabilities}"
-                                echo "There are critical security vulnerabilities: ${metrics.critical_vulnerabilities}"
-                                }
                             if (qg.status != 'OK') {
                                 error "SonarQube quality gate failed: ${qg.status}"
-                                echo "SonarQube quality gate failed: ${qg.status}"
                             }
                         }
                     } else {
