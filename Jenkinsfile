@@ -134,18 +134,13 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    // TODO: fix all issues and remove this flag for master branch instead of skipping these checks
-                    if (env.BRANCH_NAME != 'master') {
-                        // Wait for the SonarQube analysis to complete and check the quality gate status
-                        timeout(time: 1, unit: 'HOURS') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "SonarQube quality gate failed: ${qg.status}"
-                            }
+                    echo "SonarQube QualityGate: In case of failure, please find project's analysis results from url provided in previous stage"
+                    // Wait for the SonarQube analysis to complete and check the quality gate status
+                    timeout(time: 1, unit: 'HOURS') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "SonarQube quality gate failed: ${qg.status}"
                         }
-                    } else {
-                        echo "Skipping quality gate checks for master branch."
-                        echo "TODO: fix all issues and remove this flag for master branch instead of skipping these checks"
                     }
                 }
             }
