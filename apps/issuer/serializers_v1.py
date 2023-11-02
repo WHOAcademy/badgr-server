@@ -154,7 +154,7 @@ class BadgeClassSerializerV1(OriginalJsonSerializerMixin, serializers.Serializer
     id = serializers.IntegerField(required=False, read_only=True)
     name = StripTagsCharField(max_length=255)
     image = ValidImageField(required=False)
-    slug = StripTagsCharField(max_length=255, read_only=True, source='entity_id')
+    slug = StripTagsCharField(max_length=255)
     criteria = MarkdownCharField(allow_blank=True, required=False, write_only=True)
     criteria_text = MarkdownCharField(required=False, allow_null=True, allow_blank=True)
     criteria_url = StripTagsCharField(required=False, allow_blank=True, allow_null=True, validators=[URLValidator()])
@@ -234,6 +234,18 @@ class BadgeClassSerializerV1(OriginalJsonSerializerMixin, serializers.Serializer
         return instance
 
     def validate(self, data):
+
+        if "slug" not in data:
+            raise serializers.ValidationError(
+                "slug is a required field"
+            )
+        slug = data.get("slug")
+        if BadgeClass.objects.filter(slug=slug).exists():
+            raise serializers.ValidationError(
+                "badge class already exists"
+            )
+
+
         if 'criteria' in data:
             if 'criteria_url' in data or 'criteria_text' in data:
                 raise serializers.ValidationError(
@@ -265,7 +277,11 @@ class BadgeClassSerializerV1(OriginalJsonSerializerMixin, serializers.Serializer
         if 'issuer' in self.context:
             validated_data['issuer'] = self.context.get('issuer')
 
-        new_badgeclass = BadgeClass.objects.create(**validated_data)
+        slug = validated_data.pop("slug",None)
+        new_badgeclass, is_created = BadgeClass.objects.get_or_create(
+            defaults = validated_data,
+            slug = slug,
+        )
         return new_badgeclass
 
 

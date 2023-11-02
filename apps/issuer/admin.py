@@ -92,7 +92,8 @@ class BadgeClassExtensionInline(TabularInline):
 
 
 class BadgeClassAdmin(DjangoObjectActions, ModelAdmin):
-    readonly_fields = ('created_by', 'created_at', 'updated_at', 'old_json', 'source', 'source_url', 'entity_id', 'slug')
+    # readonly_fields = ('created_by', 'created_at', 'updated_at', 'old_json', 'source', 'source_url', 'entity_id', 'slug')
+    readonly_fields = ('created_by', 'created_at', 'updated_at', 'old_json', 'source', 'source_url', 'slug')
     list_display = ('badge_image', 'name', 'entity_id', 'issuer_link', 'recipient_count')
     list_display_links = ('badge_image', 'name',)
     list_filter = ('created_at',)
