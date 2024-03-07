@@ -4,6 +4,8 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ include "badgr.fullname" . }}
+  annotations:
+    haproxy.router.openshift.io/timeout: 600s
   labels:
     {{- include "badgr.labels" . | nindent 4 }}
 spec:

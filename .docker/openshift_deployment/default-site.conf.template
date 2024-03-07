@@ -24,6 +24,8 @@ server {
         uwsgi_pass  uwsgi;
 
         include     /usr/local/nginx/conf/uwsgi_params;
+
+        uwsgi_read_timeout 600s;
     }
 
 }

@@ -4,11 +4,11 @@ description: A Helm chart to deploy the badgr-server
 type: application
 
 # HelmChart Version
-version: 1.7.0
+version: 1.7.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 1.7.5
+appVersion: 1.7.6
 
 home: https://github.com/WHOAcademy/badgr-server
 
