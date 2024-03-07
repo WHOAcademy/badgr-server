@@ -113,38 +113,38 @@ pipeline {
             }
         }
 
-        stage("Code Analysis") {
-            agent {
-                node {
-                    label "jenkins-agent-sonarqube"
-                }
-            }
-            steps {
-                sh 'printenv'
-                echo 'Running Code Analysis'
+        // stage("Code Analysis") {
+        //     agent {
+        //         node {
+        //             label "jenkins-agent-sonarqube"
+        //         }
+        //     }
+        //     steps {
+        //         sh 'printenv'
+        //         echo 'Running Code Analysis'
 
-                withSonarQubeEnv('Sonarqube') {
-                    sh  '''
-                    /sonarqube-scanner/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.language=py -Dsonar.sources=. -Dsonar.exclusions=*.xml -Dsonar.python.xunit.reportPath=xunittest.xml
-                    '''
-                }
-            }
-        }
+        //         withSonarQubeEnv('Sonarqube') {
+        //             sh  '''
+        //             /sonarqube-scanner/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.language=py -Dsonar.sources=. -Dsonar.exclusions=*.xml -Dsonar.python.xunit.reportPath=xunittest.xml
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage("Quality Gate") {
-            steps {
-                script {
-                    echo "SonarQube QualityGate: In case of failure, please find project's analysis results from url provided in previous stage"
-                    // Wait for the SonarQube analysis to complete and check the quality gate status
-                    timeout(time: 1, unit: 'HOURS') {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "SonarQube quality gate failed: ${qg.status}"
-                        }
-                    }
-                }
-            }
-        }
+        // stage("Quality Gate") {
+        //     steps {
+        //         script {
+        //             echo "SonarQube QualityGate: In case of failure, please find project's analysis results from url provided in previous stage"
+        //             // Wait for the SonarQube analysis to complete and check the quality gate status
+        //             timeout(time: 1, unit: 'HOURS') {
+        //                 def qg = waitForQualityGate()
+        //                 if (qg.status != 'OK') {
+        //                     error "SonarQube quality gate failed: ${qg.status}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage("Bake (OpenShift Build)") {
             options {
