@@ -22,11 +22,13 @@ pipeline {
         // Credentials bound in OpenShift
         GIT_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-git-auth")
         NEXUS_CREDS = credentials("${OPENSHIFT_BUILD_NAMESPACE}-nexus-password")
-        REGISTRY_PUSH_SECRET = 'who-lxp-imagepusher-secret'
+        REGISTRY_PUSH_SECRET = "image-registry-pull-secret"
 
         // Nexus Artifact repo
         NEXUS_REPO_NAME = 'labs-static'
         NEXUS_REPO_HELM = 'helm-charts'
+        NEXUS_SERVICE_HOST = "${env.SONATYPE_NEXUS_SERVICE_SERVICE_HOST ? env.SONATYPE_NEXUS_SERVICE_SERVICE_HOST : env.NEXUS_SERVICE_HOST}"
+        NEXUS_SERVICE_PORT = "${env.SONATYPE_NEXUS_SERVICE_SERVICE_PORT ? env.SONATYPE_NEXUS_SERVICE_SERVICE_PORT : env.NEXUS_SERVICE_PORT}"
 
     }
 
@@ -107,7 +109,7 @@ pipeline {
                 sh '''
                 
                     tar -zcvf ${PACKAGE} .docker/openshift_deployment .docker/etc/settings_local.prod.py waf/ apps/ requirements.txt manage.py Dockerfile
-                    curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
+                    curl -v -f -u ${NEXUS_CREDS} --upload-file ${PACKAGE} http://${NEXUS_SERVICE_HOST}:${NEXUS_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE}
                 
                 '''
             }
@@ -163,7 +165,7 @@ pipeline {
                 echo '### badgr ###'
                 sh  '''
                     rm -rf ${PACKAGE}
-                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
+                    curl -v -f -u ${NEXUS_CREDS} http://${NEXUS_SERVICE_HOST}:${NEXUS_SERVICE_PORT}/repository/${NEXUS_REPO_NAME}/${APP_NAME}/${PACKAGE} -o ${PACKAGE}
                     BUILD_ARGS=" --build-arg git_commit=${GIT_COMMIT} --build-arg git_url=${GIT_URL}  --build-arg build_url=${RUN_DISPLAY_URL} --build-arg build_tag=${BUILD_TAG} --build-arg GIT_CREDS_USR=${GIT_CREDS_USR} --build-arg GIT_CREDS_PSW=${GIT_CREDS_PSW}"
                     echo ${BUILD_ARGS}
                     oc delete bc ${APP_NAME} || rc=$?
@@ -214,7 +216,7 @@ pipeline {
                 sh '''
                     # package and release helm chart?
                     helm package chart/ --app-version ${VERSION} --version ${VERSION} --dependency-update
-                    curl -v -f -u ${NEXUS_CREDS} http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_HELM}/ --upload-file ${APP_NAME}-${VERSION}.tgz
+                    curl -v -f -u ${NEXUS_CREDS} http://${NEXUS_SERVICE_HOST}:${NEXUS_SERVICE_PORT}/repository/${NEXUS_REPO_HELM}/ --upload-file ${APP_NAME}-${VERSION}.tgz
                 '''
             }
         }
@@ -244,7 +246,7 @@ pipeline {
                             sleep 40
                             helm upgrade --install ${APP_NAME} \
                                 --namespace=${TARGET_NAMESPACE} \
-                                http://${SONATYPE_NEXUS_SERVICE_SERVICE_HOST}:${SONATYPE_NEXUS_SERVICE_SERVICE_PORT}/repository/${NEXUS_REPO_HELM}/${APP_NAME}-${VERSION}.tgz
+                                http://${NEXUS_SERVICE_HOST}:${NEXUS_SERVICE_PORT}/repository/${NEXUS_REPO_HELM}/${APP_NAME}-${VERSION}.tgz
                         '''
                     }
                 }
