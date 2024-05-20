@@ -1,5 +1,5 @@
 {{- if .Values.hpa.enabled }}
-apiVersion: autoscaling/v2beta2 
+apiVersion: autoscaling/v2 
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "badgr.fullname" . }}-hpa
@@ -37,3 +37,4 @@ spec:
           periodSeconds: 60
       stabilizationWindowSeconds: 0
 {{ end }}
+
